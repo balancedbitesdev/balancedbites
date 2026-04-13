@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   CUSTOMER_ACCOUNT_PKCE_COOKIE,
+  CUSTOMER_ACCOUNT_TOKEN_COOKIE,
   buildAuthorizationUrl,
   customerAccountCallbackUrl,
   fetchOpenIdConfiguration,
@@ -53,11 +54,21 @@ export async function GET(request: Request) {
 
   const res = NextResponse.redirect(authUrl);
   res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
-  res.cookies.set(CUSTOMER_ACCOUNT_PKCE_COOKIE, JSON.stringify({ state, verifier }), {
+
+  const cookieBase = {
+    path: "/" as const,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    sameSite: "lax" as const,
+  };
+  /** Drop prior session so Account doesn’t show the old user during a new sign-in/sign-up. */
+  res.cookies.set(CUSTOMER_ACCOUNT_TOKEN_COOKIE, "", {
+    ...cookieBase,
+    maxAge: 0,
+  });
+
+  res.cookies.set(CUSTOMER_ACCOUNT_PKCE_COOKIE, JSON.stringify({ state, verifier }), {
+    ...cookieBase,
     maxAge: 600,
   });
 

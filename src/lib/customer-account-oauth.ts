@@ -123,7 +123,9 @@ export function buildAuthorizationUrl(
   authUrl.searchParams.set("state", params.state);
   authUrl.searchParams.set("code_challenge", params.codeChallenge);
   authUrl.searchParams.set("code_challenge_method", "S256");
+  /** Force credential screen so users can switch accounts on a shared browser (OIDC). */
   authUrl.searchParams.set("prompt", "login");
+  authUrl.searchParams.set("max_age", "0");
   if (params.authIntent === "signup") {
     authUrl.searchParams.set("screen_hint", "signup");
   }
