@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { InlineSpinner } from "@/components/balanced-bites/InlineSpinner";
+import { useToast } from "@/components/balanced-bites/Toast";
 import { dispatchCartUpdated } from "@/lib/cart-client-api";
 import type { MenuFilterId, MenuProductSerialized } from "./menu-types";
 
@@ -16,6 +18,7 @@ type Props = {
 };
 
 export function MenuGridClient({ products }: Props) {
+  const { show: showToast } = useToast();
   const [active, setActive] = useState<MenuFilterId>("all");
   const [addingId, setAddingId] = useState<string | null>(null);
   const [qtyByProduct, setQtyByProduct] = useState<Record<string, number>>({});
@@ -47,7 +50,8 @@ export function MenuGridClient({ products }: Props) {
         const j = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(j.error ?? "Could not add to cart");
       }
-      dispatchCartUpdated();
+      dispatchCartUpdated({ added: { title: product.title } });
+      showToast(`Added “${product.title}” to your cart`);
     } catch (e) {
       console.error(e);
       alert(e instanceof Error ? e.message : "Could not add to cart");
@@ -74,10 +78,10 @@ export function MenuGridClient({ products }: Props) {
               key={id}
               type="button"
               onClick={() => setActive(id)}
-              className={`rounded-full px-5 py-2.5 text-sm font-medium transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              className={`rounded-full px-5 py-2.5 text-sm font-medium transition-[background-color,color,box-shadow,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-95 ${
                 isOn
-                  ? "bg-[#426237] text-white shadow-sm"
-                  : "bg-white/90 text-[#426237] shadow-sm ring-1 ring-[#426237]/10 hover:bg-white"
+                  ? "bg-[#426237] text-white shadow-[0_12px_32px_-18px_rgba(66,98,55,0.55)]"
+                  : "bg-white/90 text-[#426237] shadow-sm ring-1 ring-[#426237]/10 hover:bg-white hover:shadow-[0_10px_28px_-20px_rgba(66,98,55,0.25)]"
               }`}
             >
               {label}
@@ -97,7 +101,7 @@ export function MenuGridClient({ products }: Props) {
         >
           {visible.map((product) => (
             <li key={product.id} className="h-full">
-              <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-md">
+              <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
                 <ProductCardImage
                   images={product.images}
                   fallbackUrl={product.imageUrl}
@@ -160,7 +164,7 @@ export function MenuGridClient({ products }: Props) {
                             [product.id]: n,
                           }));
                         }}
-                        className="w-16 rounded-lg border border-[#426237]/20 bg-[#f4f1eb] px-2 py-1.5 text-center text-sm font-semibold text-[#426237] outline-none focus:ring-2 focus:ring-[#426237]/30"
+                        className="w-16 rounded-lg border border-[#426237]/20 bg-[#f4f1eb] px-2 py-1.5 text-center text-sm font-semibold text-[#426237] outline-none transition-[border-color,box-shadow] duration-150 ease-out focus:border-[#426237]/40 focus:outline-none focus:ring-2 focus:ring-[#426237]/30 focus:ring-offset-2 focus:ring-offset-white"
                       />
                     </label>
                     <button
@@ -185,15 +189,23 @@ export function MenuGridClient({ products }: Props) {
                         disabled={addingId === product.id}
                         onClick={() => addToCart(product)}
                         title="Add to cart"
-                        className="flex h-11 min-w-[7rem] items-center justify-center rounded-full bg-[#426237] px-4 text-sm font-semibold text-white shadow-sm transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#2c4224] disabled:opacity-60 active:scale-[0.96]"
+                        aria-busy={addingId === product.id}
+                        className="flex h-11 min-w-[8.5rem] items-center justify-center gap-2 rounded-full bg-[#426237] px-4 text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.65)] transition-[background-color,box-shadow,transform,opacity] duration-200 ease-out hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:bg-[#426237]/45 disabled:text-white/90 disabled:shadow-none active:scale-95"
                       >
-                        {addingId === product.id ? "Adding…" : "Add to cart"}
+                        {addingId === product.id ? (
+                          <>
+                            <InlineSpinner className="text-white" />
+                            <span className="sr-only">Adding to cart</span>
+                          </>
+                        ) : (
+                          "Add to cart"
+                        )}
                       </button>
                     ) : (
                       <button
                         type="button"
                         disabled
-                        className="rounded-full bg-[#f4f1eb] px-4 py-2.5 text-sm font-medium text-[#426237]/45"
+                        className="cursor-not-allowed rounded-full bg-[#e8e4dc] px-4 py-2.5 text-sm font-medium text-[#426237]/40 ring-1 ring-[#426237]/10"
                       >
                         Unavailable
                       </button>
@@ -206,6 +218,32 @@ export function MenuGridClient({ products }: Props) {
         </ul>
       )}
     </div>
+  );
+}
+
+function ProductCardImageSlide({ url, alt }: { url: string; alt: string }) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <>
+      <div
+        className={`absolute inset-0 bg-gradient-to-br from-[#ebe6de] to-[#f4f1eb] transition-opacity duration-500 ease-out ${
+          loaded ? "opacity-0" : "opacity-100"
+        }`}
+        aria-hidden
+      >
+        <div className="absolute inset-0 animate-pulse bg-[#426237]/[0.06]" />
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element -- Shopify CDN */}
+      <img
+        src={url}
+        alt={alt}
+        onLoad={() => setLoaded(true)}
+        className={`h-full w-full object-cover transition-[opacity,transform] duration-500 ease-out ${
+          loaded ? "scale-100 opacity-100" : "scale-[1.02] opacity-0"
+        }`}
+      />
+    </>
   );
 }
 
@@ -258,13 +296,7 @@ function ProductCardImage({
   return (
     <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[#f4f1eb]">
       {current != null ? (
-        // eslint-disable-next-line @next/next/no-img-element -- Shopify CDN
-        <img
-          key={current.url}
-          src={current.url}
-          alt={current.alt}
-          className="h-full w-full object-cover transition-opacity duration-300 ease-out"
-        />
+        <ProductCardImageSlide key={current.url} url={current.url} alt={current.alt} />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
           <p className="text-center text-xs font-medium tracking-wide text-[#426237]/35">
@@ -280,7 +312,7 @@ function ProductCardImage({
           <button
             type="button"
             onClick={goPrev}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#426237] shadow-sm ring-1 ring-[#426237]/15 transition-colors hover:bg-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#426237] shadow-sm ring-1 ring-[#426237]/15 transition-[background-color,transform] duration-150 ease-out hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent active:scale-95"
             aria-label="Previous photo"
           >
             <ChevronIcon dir="left" className="h-5 w-5" />
@@ -288,7 +320,7 @@ function ProductCardImage({
           <button
             type="button"
             onClick={shuffle}
-            className="flex h-9 min-w-[5.5rem] items-center justify-center gap-1.5 rounded-full bg-white/90 px-3 text-xs font-semibold text-[#426237] shadow-sm ring-1 ring-[#426237]/15 transition-colors hover:bg-white"
+            className="flex h-9 min-w-[5.5rem] items-center justify-center gap-1.5 rounded-full bg-white/90 px-3 text-xs font-semibold text-[#426237] shadow-sm ring-1 ring-[#426237]/15 transition-[background-color,transform] duration-150 ease-out hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent active:scale-95"
             aria-label="Shuffle to a random photo"
           >
             <ShuffleIcon className="h-4 w-4 shrink-0" />
@@ -297,7 +329,7 @@ function ProductCardImage({
           <button
             type="button"
             onClick={goNext}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#426237] shadow-sm ring-1 ring-[#426237]/15 transition-colors hover:bg-white"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#426237] shadow-sm ring-1 ring-[#426237]/15 transition-[background-color,transform] duration-150 ease-out hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent active:scale-95"
             aria-label="Next photo"
           >
             <ChevronIcon dir="right" className="h-5 w-5" />

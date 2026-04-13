@@ -64,7 +64,7 @@ export default function LearnHubPage() {
         </ul>
       </main>
 
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

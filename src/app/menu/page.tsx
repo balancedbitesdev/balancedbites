@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { SiteFooter } from "@/components/balanced-bites/SiteFooter";
 import { SiteHeader } from "@/components/balanced-bites/SiteHeader";
 import {
@@ -288,96 +286,10 @@ export default async function MenuPage() {
           )}
         </section>
 
-        <section
-          className="mx-auto max-w-6xl px-4 pb-24 sm:px-6"
-          aria-labelledby="info-heading"
-        >
-          <h2 id="info-heading" className="sr-only">
-            Why Balanced Bites
-          </h2>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-            <article
-              id="about"
-              className="relative overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-[#426237]/10"
-            >
-              <div className="absolute inset-0">
-                <Image
-                  src="https://picsum.photos/seed/balanced-bites-kitchen/960/720"
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority={false}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#f4f1eb] via-[#f4f1eb]/90 to-[#f4f1eb]/65" />
-              </div>
-              <div className="relative p-8 sm:p-10">
-                <h3 className="menu-serif text-2xl font-semibold text-[#426237] sm:text-3xl">
-                  Farm to Table Precision
-                </h3>
-                <p className="mt-4 max-w-md text-pretty text-sm leading-relaxed text-gray-600">
-                  We partner with growers who meet our standards for freshness and
-                  sustainability, so every ingredient has a traceable path to your
-                  plate.
-                </p>
-                <Link
-                  href="#footer"
-                  className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#426237] underline decoration-[#426237]/30 underline-offset-4 transition-colors hover:decoration-[#426237]"
-                >
-                  Learn about our sourcing
-                  <span aria-hidden>→</span>
-                </Link>
-              </div>
-            </article>
 
-            <article className="flex flex-col justify-between overflow-hidden rounded-3xl bg-[#426237] p-8 text-white shadow-sm sm:p-10">
-              <div>
-                <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25">
-                  <ShieldCheckIcon className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="menu-serif text-2xl font-semibold sm:text-3xl">
-                  Nutritionist Approved
-                </h3>
-                <p className="mt-4 max-w-md text-pretty text-sm leading-relaxed text-white/85">
-                  Recipes are reviewed for balance and clarity, with macros you can
-                  trust and flavors you will want on repeat.
-                </p>
-              </div>
-              <p className="menu-script mt-8 text-xl text-white/95 sm:text-2xl">
-                Trust the science.
-              </p>
-            </article>
-          </div>
-        </section>
       </main>
 
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
-  );
-}
-
-function ShieldCheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M12 2.5l7 3.2v5c0 4.5-2.8 8.4-7 9.8-4.2-1.4-7-5.3-7-9.8v-5l7-3.2z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9.2 12.3l1.8 1.8 4.3-4.3"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

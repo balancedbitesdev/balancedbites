@@ -25,7 +25,7 @@ export default function NutritionBasicsPage() {
           </p>
         </article>
       </main>
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

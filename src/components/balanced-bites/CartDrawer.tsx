@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Skeleton from "react-loading-skeleton";
 import {
   createContext,
   useCallback,
@@ -18,6 +19,7 @@ import {
   subscribeCartUpdated,
 } from "@/lib/cart-client-api";
 import type { CartPayload } from "@/lib/shopify-cart";
+import { useMobileMenu } from "./MobileMenuContext";
 
 type CartDrawerContextValue = {
   open: boolean;
@@ -76,6 +78,7 @@ function formatMoney(amount: string, currencyCode: string): string {
 
 export function CartDrawer() {
   const { open, setOpen } = useCartDrawer();
+  const { open: mobileMenuOpen } = useMobileMenu();
   const router = useRouter();
   const [cart, setCart] = useState<CartPayload | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -94,6 +97,10 @@ export function CartDrawer() {
     if (!open) return;
     void load();
   }, [open, load]);
+
+  useEffect(() => {
+    if (mobileMenuOpen) setOpen(false);
+  }, [mobileMenuOpen, setOpen]);
 
   useEffect(() => {
     return subscribeCartUpdated(() => {
@@ -148,14 +155,14 @@ export function CartDrawer() {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] transition-[visibility] duration-300 ${
+      className={`fixed inset-0 z-[1070] transition-[visibility] duration-300 ${
         open ? "visible" : "pointer-events-none invisible delay-300"
       }`}
       aria-hidden={!open}
     >
       <button
         type="button"
-        className={`absolute inset-0 bg-[#1a1a1a]/40 backdrop-blur-[2px] transition-opacity duration-300 ease-out ${
+        className={`absolute inset-0 bg-[#1a1a1a]/45 backdrop-blur-[2px] transition-opacity duration-300 ease-out ${
           open ? "opacity-100" : "opacity-0"
         }`}
         onClick={() => setOpen(false)}
@@ -168,7 +175,7 @@ export function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Shopping cart"
-        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-[#f4f1eb] shadow-2xl ring-1 ring-[#426237]/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`absolute right-0 top-0 flex h-full w-full max-w-[min(75vw,28rem)] flex-col bg-[#f4f1eb] shadow-2xl ring-1 ring-[#426237]/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -177,7 +184,7 @@ export function CartDrawer() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-[#426237] ring-1 ring-[#426237]/15 transition-colors hover:bg-white"
+            className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-[#426237] ring-1 ring-[#426237]/15 transition-[background-color,color,transform] duration-150 ease-out hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-95"
             aria-label="Close cart"
           >
             <CloseIcon className="h-5 w-5" />
@@ -186,7 +193,11 @@ export function CartDrawer() {
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
           {loading ? (
-            <p className="text-center text-sm text-gray-600">Loading cart…</p>
+            <ul className="space-y-3" aria-busy="true" aria-label="Loading cart">
+              <CartDrawerLineSkeleton />
+              <CartDrawerLineSkeleton />
+              <CartDrawerLineSkeleton />
+            </ul>
           ) : cart == null || lines.length === 0 ? (
             <div className="rounded-2xl bg-white/90 px-5 py-10 text-center ring-1 ring-[#426237]/10">
               <p className="font-semibold text-[#426237]">Your cart is empty</p>
@@ -196,7 +207,7 @@ export function CartDrawer() {
               <Link
                 href="/menu"
                 onClick={() => setOpen(false)}
-                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-sm font-semibold text-white hover:bg-[#2c4224]"
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.55)] transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95"
               >
                 Browse menu
               </Link>
@@ -241,14 +252,14 @@ export function CartDrawer() {
                               const v = Math.floor(Number(e.target.value) || 1);
                               if (v !== line.quantity) void setQty(line.id, v);
                             }}
-                            className="w-14 rounded-md border border-[#426237]/20 bg-[#f4f1eb] px-1 py-0.5 text-center text-xs font-semibold"
+                            className="w-14 rounded-md border border-[#426237]/20 bg-[#f4f1eb] px-1 py-0.5 text-center text-xs font-semibold outline-none transition-[border-color,box-shadow] duration-150 ease-out focus:border-[#426237]/35 focus:ring-2 focus:ring-[#426237]/25 focus:ring-offset-1 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
                           />
                         </label>
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => void removeLine(line.id)}
-                          className="text-xs font-semibold text-red-700 underline-offset-2 hover:underline"
+                          className="text-xs font-semibold text-red-700 underline-offset-2 transition-[opacity,transform] duration-150 ease-out hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 focus-visible:ring-offset-1 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-45 active:scale-95"
                         >
                           Remove
                         </button>
@@ -278,7 +289,7 @@ export function CartDrawer() {
             {cart.checkoutUrl ? (
               <a
                 href={cart.checkoutUrl}
-                className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full bg-[#426237] px-6 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2c4224] active:scale-[0.98]"
+                className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full bg-[#426237] px-6 text-center text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.65)] transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-95"
               >
                 Proceed to secure checkout
               </a>
@@ -289,6 +300,29 @@ export function CartDrawer() {
         ) : null}
       </aside>
     </div>
+  );
+}
+
+function CartDrawerLineSkeleton() {
+  return (
+    <li className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-[#426237]/10">
+      <Skeleton
+        width={64}
+        height={64}
+        borderRadius={12}
+        className="shrink-0 leading-none"
+        containerClassName="leading-none"
+      />
+      <div className="min-w-0 flex-1 space-y-2 py-1">
+        <Skeleton height={16} width="72%" className="leading-none" />
+        <Skeleton height={12} width="38%" className="leading-none" />
+        <Skeleton height={32} width={72} className="leading-none" />
+      </div>
+      <div className="flex w-14 flex-col items-end gap-2 pt-0.5">
+        <Skeleton height={12} width={40} className="leading-none" />
+        <Skeleton height={20} width={52} className="leading-none" />
+      </div>
+    </li>
   );
 }
 

@@ -58,14 +58,13 @@ export default function AboutPage() {
                         Founded by Dalia
                       </span>
                     </div>
-                    <div className="px-5 pt-5">
+                    <div className="relative aspect-[13/16] w-full overflow-hidden">
                       <Image
                         src="/Dalia.png"
                         alt="Dalia Seoudi, certified food nutritionist and founder of Balanced Bites"
-                        width={520}
-                        height={640}
-                        className="mx-auto h-auto w-full max-w-[16rem] object-contain object-center"
-                        sizes="(max-width: 1024px) min(80vw, 18rem), 288px"
+                        fill
+                        className="object-cover object-center"
+                        sizes="(max-width: 1024px) min(90vw, 21rem), 340px"
                         priority
                       />
                     </div>
@@ -115,7 +114,7 @@ export default function AboutPage() {
         </article>
       </main>
 
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

@@ -49,6 +49,15 @@ export function ScrollReveal({
     const el = ref.current;
     if (!el) return;
 
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- show content when motion is reduced
+      setVisible(true);
+      return;
+    }
+
     if (typeof IntersectionObserver === "undefined") {
       setVisible(true);
       return;

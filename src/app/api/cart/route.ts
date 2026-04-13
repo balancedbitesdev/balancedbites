@@ -1,6 +1,12 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
+  MAX_CART_LINES_PER_REQUEST,
+  isValidShopifyCartGid,
+  isValidShopifyCartLineGid,
+  isValidShopifyProductVariantGid,
+} from "@/lib/cart-input-validation";
+import {
   BB_CART_COOKIE,
   storefrontCartLinesAdd,
   storefrontCartLinesRemove,
@@ -27,6 +33,11 @@ export async function GET() {
   if (cartId == null || cartId.length === 0) {
     return NextResponse.json({ cart: null });
   }
+  if (!isValidShopifyCartGid(cartId)) {
+    const res = NextResponse.json({ cart: null });
+    res.cookies.delete(BB_CART_COOKIE);
+    return res;
+  }
   const cart = await storefrontGetCart(cartId);
   if (cart == null) {
     const res = NextResponse.json({ cart: null });
@@ -52,6 +63,9 @@ export async function POST(req: Request) {
 
   const jar = await cookies();
   let cartId = jar.get(BB_CART_COOKIE)?.value ?? null;
+  if (cartId != null && cartId !== "" && !isValidShopifyCartGid(cartId)) {
+    cartId = null;
+  }
 
   async function ensureCart(): Promise<string | null> {
     if (cartId != null && cartId.length > 0) {
@@ -73,6 +87,9 @@ export async function POST(req: Request) {
     if (merchandiseId == null || merchandiseId.length === 0) {
       return NextResponse.json({ error: "merchandiseId required" }, { status: 400 });
     }
+    if (!isValidShopifyProductVariantGid(merchandiseId)) {
+      return NextResponse.json({ error: "Invalid merchandiseId" }, { status: 400 });
+    }
     const id = await ensureCart();
     if (id == null) {
       return NextResponse.json({ error: "Could not create cart" }, { status: 502 });
@@ -92,14 +109,26 @@ export async function POST(req: Request) {
   }
 
   if (body.action === "update") {
-    if (cartId == null) {
+    if (cartId == null || !isValidShopifyCartGid(cartId)) {
       return NextResponse.json({ error: "No cart" }, { status: 400 });
     }
     const lines = body.lines;
     if (!Array.isArray(lines) || lines.length === 0) {
       return NextResponse.json({ error: "lines required" }, { status: 400 });
     }
-    const { cart, errors } = await storefrontCartLinesUpdate(cartId, lines);
+    if (lines.length > MAX_CART_LINES_PER_REQUEST) {
+      return NextResponse.json({ error: "Too many lines" }, { status: 400 });
+    }
+    const normalized = lines.map((line) => ({
+      id: String(line.id),
+      quantity: Math.min(99, Math.max(1, Math.floor(Number(line.quantity) || 1))),
+    }));
+    for (const line of normalized) {
+      if (!isValidShopifyCartLineGid(line.id)) {
+        return NextResponse.json({ error: "Invalid line id" }, { status: 400 });
+      }
+    }
+    const { cart, errors } = await storefrontCartLinesUpdate(cartId, normalized);
     if (errors.length > 0 || cart == null) {
       return NextResponse.json(
         { error: errors[0] ?? "Update failed" },
@@ -112,14 +141,23 @@ export async function POST(req: Request) {
   }
 
   if (body.action === "remove") {
-    if (cartId == null) {
+    if (cartId == null || !isValidShopifyCartGid(cartId)) {
       return NextResponse.json({ error: "No cart" }, { status: 400 });
     }
     const lineIds = body.lineIds;
     if (!Array.isArray(lineIds) || lineIds.length === 0) {
       return NextResponse.json({ error: "lineIds required" }, { status: 400 });
     }
-    const { cart, errors } = await storefrontCartLinesRemove(cartId, lineIds);
+    if (lineIds.length > MAX_CART_LINES_PER_REQUEST) {
+      return NextResponse.json({ error: "Too many lineIds" }, { status: 400 });
+    }
+    const ids = lineIds.map((id) => String(id));
+    for (const id of ids) {
+      if (!isValidShopifyCartLineGid(id)) {
+        return NextResponse.json({ error: "Invalid line id" }, { status: 400 });
+      }
+    }
+    const { cart, errors } = await storefrontCartLinesRemove(cartId, ids);
     if (errors.length > 0) {
       return NextResponse.json({ error: errors[0] }, { status: 400 });
     }

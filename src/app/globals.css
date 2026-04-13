@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -19,7 +24,7 @@ html {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -56,4 +61,42 @@ body {
 .menu-scrollbar::-webkit-scrollbar-thumb {
   border-radius: 9999px;
   background: rgba(66, 98, 55, 0.2);
+}
+
+@keyframes bb-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.bb-toast-enter {
+  animation: bb-toast-in 280ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes bb-cart-bump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bb-cart-bump {
+  animation: bb-cart-bump 420ms cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-toast-enter,
+  .bb-cart-bump {
+    animation: none;
+  }
 }

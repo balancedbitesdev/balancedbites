@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
-import { Dancing_Script, Fraunces, Geist, Geist_Mono } from "next/font/google";
-import { CartDrawer, CartDrawerProvider } from "@/components/balanced-bites/CartDrawer";
+import { Dancing_Script, Fraunces, Geist } from "next/font/google";
+import { AppProviders } from "@/components/balanced-bites/AppProviders";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -48,13 +43,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${dancingScript.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${fraunces.variable} ${dancingScript.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
-        <CartDrawerProvider>
-          {children}
-          <CartDrawer />
-        </CartDrawerProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

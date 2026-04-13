@@ -37,11 +37,6 @@ export default function ContactPage() {
             >
               Message on WhatsApp
             </a>
-            <p className="mt-4 text-xs text-gray-500">
-              Set <code className="rounded bg-[#f4f1eb] px-1">NEXT_PUBLIC_WHATSAPP_E164</code> in{" "}
-              <code className="rounded bg-[#f4f1eb] px-1">.env.local</code> to your number (e.g.
-              201234567890).
-            </p>
 
             <div className="mt-10 border-t border-[#426237]/10 pt-8">
               <h2 className="text-lg font-semibold text-[#426237]">Direct</h2>
@@ -101,7 +96,7 @@ export default function ContactPage() {
         </div>
       </main>
 
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

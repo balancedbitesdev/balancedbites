@@ -33,25 +33,21 @@ export default function Home() {
       <SiteHeader active="home" orderNowHref="/menu" />
 
       <main className="flex flex-1 flex-col">
-        {/* ──────────────────── HERO ──────────────────── */}
-        <section className="px-4 pb-16 pt-8 sm:px-8 sm:pb-20 sm:pt-12">
-          <div className="mx-auto max-w-6xl">
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-[#f8f4ed] p-2 shadow-[0_30px_90px_-40px_rgba(66,98,55,0.35)] ring-1 ring-[#426237]/10 sm:rounded-[3rem] sm:p-3">
-              <div className="relative overflow-hidden rounded-[calc(2.5rem-0.5rem)] bg-[linear-gradient(135deg,#fffdf8_0%,#f7f2e8_45%,#f3eee4_100%)] px-5 py-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.65)] sm:px-8 sm:py-12 lg:px-12 lg:py-16">
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-70"
-                  aria-hidden
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle at 15% 20%, rgba(172,128,88,0.18), transparent 24%), radial-gradient(circle at 85% 18%, rgba(66,98,55,0.12), transparent 26%), radial-gradient(circle at 75% 78%, rgba(172,128,88,0.12), transparent 22%)",
-                  }}
-                />
-                <div
-                  className="pointer-events-none absolute right-8 top-8 h-36 w-36 rounded-full bg-white/35 blur-3xl"
-                  aria-hidden
-                />
-
-                <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)] lg:items-center lg:gap-12">
+        {/* ──────────────────── HERO (dedicated band) ──────────────────── */}
+        <section
+          className="relative overflow-hidden border-b border-[#426237]/[0.08] bg-gradient-to-b from-[#fffdf9] via-[#f3eee4] to-[#e8e2d6] px-3 pb-14 pt-6 shadow-[inset_0_-1px_0_rgba(255,255,255,0.35)] sm:px-8 sm:pb-20 sm:pt-12"
+          aria-label="Introduction"
+        >
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.45]"
+            aria-hidden
+            style={{
+              backgroundImage:
+                "radial-gradient(ellipse 120% 80% at 50% -20%, rgba(66,98,55,0.09), transparent 55%), radial-gradient(circle at 90% 20%, rgba(172,128,88,0.12), transparent 28%)",
+            }}
+          />
+          <div className="relative mx-auto max-w-6xl py-8 sm:py-12 lg:py-16">
+            <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)] lg:items-center lg:gap-12">
                   {/* Left — copy */}
                   <div className="max-w-2xl">
                     <div className="flex flex-wrap gap-2">
@@ -59,15 +55,15 @@ export default function Home() {
                       <HeroChip label="By Dalia Seoudi" />
                     </div>
 
-                    <h1 className="menu-serif mt-6 max-w-[11ch] text-[2.8rem] font-bold leading-[0.92] tracking-[-0.04em] text-[#426237] sm:text-[4.15rem] lg:text-[5.2rem]">
+                    <h1 className="menu-serif mt-6 max-w-[11ch] text-[2.25rem] font-bold leading-[0.92] tracking-[-0.04em] text-[#426237] sm:text-[4.15rem] lg:text-[5.2rem]">
                       Food for the Whole Family
                     </h1>
 
-                    <p className="menu-script mt-4 text-[1.55rem] font-medium text-[#ac8058] sm:text-[2rem]">
+                    <p className="menu-script mt-3 text-[1.35rem] font-medium text-[#ac8058] sm:mt-4 sm:text-[2rem]">
                       Healthy Living Made Simple
                     </p>
 
-                    <p className="mt-6 max-w-xl text-pretty text-base leading-7 text-[#426237]/75 sm:text-lg">
+                    <p className="mt-4 max-w-xl text-pretty text-[0.94rem] leading-7 text-[#426237]/75 sm:mt-6 sm:text-lg">
                       Eating healthy isn&apos;t just for diets—it&apos;s for everyone at the table.
                       Balanced Bites makes clean, satisfying meals that support kids&apos; growth,
                       help adults stay energized, and build lifelong healthy habits.
@@ -97,8 +93,8 @@ export default function Home() {
 
                   {/* Right — bento cards */}
                   <div className="relative">
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                      <div className="rounded-[2rem] bg-[#426237] p-1.5 shadow-[0_24px_50px_-30px_rgba(66,98,55,0.65)] ring-1 ring-[#426237]/10 sm:col-span-2">
+                    <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-2">
+                      <div className="rounded-[1.5rem] bg-[#426237] p-1.5 shadow-[0_24px_50px_-30px_rgba(66,98,55,0.65)] ring-1 ring-[#426237]/10 sm:col-span-2 sm:rounded-[2rem]">
                         <div className="rounded-[calc(2rem-0.375rem)] bg-[linear-gradient(135deg,#4c6f3f_0%,#3a5630_100%)] px-5 py-5 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.14)]">
                           <div className="flex items-start justify-between gap-4">
                             <div>
@@ -129,8 +125,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="rounded-[1.75rem] bg-white/80 p-1.5 shadow-[0_18px_45px_-30px_rgba(66,98,55,0.28)] ring-1 ring-[#426237]/10">
-                        <div className="rounded-[calc(1.75rem-0.375rem)] bg-white px-5 py-5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.65)]">
+                      <div className="rounded-[1.25rem] bg-white/80 p-1.5 shadow-[0_18px_45px_-30px_rgba(66,98,55,0.28)] ring-1 ring-[#426237]/10 sm:rounded-[1.75rem]">
+                        <div className="rounded-[calc(1.25rem-0.375rem)] bg-white px-4 py-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.65)] sm:rounded-[calc(1.75rem-0.375rem)] sm:px-5 sm:py-5">
                           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]">
                             Benefits
                           </p>
@@ -142,8 +138,8 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="rounded-[1.75rem] bg-[#efe8dc] p-1.5 shadow-[0_18px_45px_-30px_rgba(66,98,55,0.28)] ring-1 ring-[#426237]/10">
-                        <div className="rounded-[calc(1.75rem-0.375rem)] bg-[linear-gradient(180deg,#fffaf0_0%,#f3ebde_100%)] px-5 py-5">
+                      <div className="rounded-[1.25rem] bg-[#efe8dc] p-1.5 shadow-[0_18px_45px_-30px_rgba(66,98,55,0.28)] ring-1 ring-[#426237]/10 sm:rounded-[1.75rem]">
+                        <div className="rounded-[calc(1.25rem-0.375rem)] bg-[linear-gradient(180deg,#fffaf0_0%,#f3ebde_100%)] px-4 py-4 sm:rounded-[calc(1.75rem-0.375rem)] sm:px-5 sm:py-5">
                           <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#426237]/70">
                             Clean Keto
                           </p>
@@ -155,19 +151,17 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
           </div>
         </section>
 
         {/* ──────────────── WHAT WE BELIEVE ──────────────── */}
-        <section className="px-4 pb-20 sm:px-8 sm:pb-28">
+        <section className="bg-[#f4f1eb] px-3 pb-16 pt-4 sm:px-8 sm:pb-28 sm:pt-6">
           <div className="mx-auto max-w-5xl">
             <ScrollReveal className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]">
                 What we believe
               </p>
-              <h2 className="menu-serif mx-auto mt-4 max-w-xl text-[2rem] font-bold leading-[1.1] tracking-tight text-[#426237] sm:text-[2.65rem]">
+              <h2 className="menu-serif mx-auto mt-4 max-w-xl text-[1.65rem] font-bold leading-[1.1] tracking-tight text-[#426237] sm:text-[2.65rem]">
                 Healthy eating should feel like home
               </h2>
               <p className="mx-auto mt-5 max-w-lg text-base leading-7 text-[#426237]/60">
@@ -176,7 +170,7 @@ export default function Home() {
               </p>
             </ScrollReveal>
 
-            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-4 sm:mt-14 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
               {[
                 {
                   title: "Support kids\u2019 growth",
@@ -244,7 +238,7 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ──────────── CLEAN KETO ──────────── */}
-        <section className="px-4 py-20 sm:px-8 sm:py-28">
+        <section className="px-3 py-14 sm:px-8 sm:py-28">
           <div className="mx-auto max-w-5xl">
             <div className="grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,1.15fr)] lg:gap-16">
               <ScrollReveal variant="slide-left">
@@ -366,7 +360,7 @@ export default function Home() {
 
         {/* ──────────── CTA BAND ──────────── */}
         <ScrollReveal variant="scale">
-          <section className="px-4 pb-20 sm:px-8 sm:pb-28">
+          <section className="px-3 pb-16 sm:px-8 sm:pb-28">
             <div className="mx-auto max-w-4xl">
               <div className="relative overflow-hidden rounded-[2.5rem] bg-[#f8f4ed] p-2 shadow-[0_30px_80px_-40px_rgba(66,98,55,0.3)] ring-1 ring-[#426237]/10 sm:p-3">
                 <div className="relative overflow-hidden rounded-[calc(2.5rem-0.5rem)] bg-[linear-gradient(135deg,#fffdf8_0%,#f7f2e8_45%,#f3eee4_100%)] px-6 py-12 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.65)] sm:px-10 sm:py-16">
@@ -414,7 +408,7 @@ export default function Home() {
         </ScrollReveal>
       </main>
 
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

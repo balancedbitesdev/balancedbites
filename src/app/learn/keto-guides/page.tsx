@@ -24,7 +24,7 @@ export default function KetoGuidesPage() {
           </p>
         </article>
       </main>
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

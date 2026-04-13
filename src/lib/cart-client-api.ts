@@ -2,16 +2,27 @@ import type { CartPayload } from "@/lib/shopify-cart";
 
 const CART_UPDATED_EVENT = "bb-cart-updated";
 
-export function dispatchCartUpdated() {
+export type CartUpdatedDetail = {
+  /** Present when the cart change was triggered by adding a line item */
+  added?: { title: string };
+};
+
+export function dispatchCartUpdated(detail: CartUpdatedDetail = {}) {
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event(CART_UPDATED_EVENT));
+    window.dispatchEvent(
+      new CustomEvent<CartUpdatedDetail>(CART_UPDATED_EVENT, { detail }),
+    );
   }
 }
 
-export function subscribeCartUpdated(handler: () => void) {
+export function subscribeCartUpdated(handler: (detail: CartUpdatedDetail) => void) {
   if (typeof window === "undefined") return () => {};
-  window.addEventListener(CART_UPDATED_EVENT, handler);
-  return () => window.removeEventListener(CART_UPDATED_EVENT, handler);
+  const listener = (e: Event) => {
+    const ce = e as CustomEvent<CartUpdatedDetail>;
+    handler(ce.detail ?? {});
+  };
+  window.addEventListener(CART_UPDATED_EVENT, listener);
+  return () => window.removeEventListener(CART_UPDATED_EVENT, listener);
 }
 
 export async function fetchCartPayload(): Promise<CartPayload | null> {

@@ -134,7 +134,7 @@ export default async function MyPlanPage() {
         <PlanWizard products={products} />
       </main>
 
-      <SiteFooter variant="green" />
+      <SiteFooter />
     </div>
   );
 }

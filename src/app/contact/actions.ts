@@ -24,7 +24,8 @@ export async function submitContact(
     return { ok: false, message: "Please enter a longer message (at least 10 characters)." };
   }
 
-  // Wire to Resend, SendGrid, or CRM when ready. For now we acknowledge receipt.
+  // Submissions are validated here only — nothing is emailed or stored until you wire
+  // Resend, SendGrid, a database, or a CRM (see env / integration docs).
   void phone;
 
   return {

@@ -75,7 +75,7 @@ export default async function AccountPage({
             </p>
             <a
               href="/api/customer-account/logout"
-              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full border-2 border-[#426237]/30 bg-white px-8 py-3 text-sm font-semibold text-[#426237] transition-colors hover:bg-[#f4f1eb]"
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full border-2 border-[#426237]/30 bg-white px-8 py-3 text-sm font-semibold text-[#426237] transition-[background-color,transform] duration-200 ease-out hover:bg-[#f4f1eb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95"
             >
               Log out
             </a>
@@ -93,13 +93,13 @@ export default async function AccountPage({
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <a
                     href="/api/customer-account/start?intent=signup"
-                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#2c4224]"
+                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-center text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.55)] transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95"
                   >
                     Sign up
                   </a>
                   <a
                     href="/api/customer-account/start?intent=login"
-                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border-2 border-[#426237] bg-white px-8 py-3 text-center text-sm font-semibold text-[#426237] transition-colors hover:bg-[#f4f1eb]"
+                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border-2 border-[#426237] bg-white px-8 py-3 text-center text-sm font-semibold text-[#426237] transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#f4f1eb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95"
                   >
                     Log in
                   </a>
@@ -130,7 +130,7 @@ export default async function AccountPage({
 
       </main>
 
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }

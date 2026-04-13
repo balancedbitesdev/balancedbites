@@ -24,7 +24,7 @@ export default function HealthyTipsPage() {
           </p>
         </article>
       </main>
-      <SiteFooter variant="beige" />
+      <SiteFooter />
     </div>
   );
 }
