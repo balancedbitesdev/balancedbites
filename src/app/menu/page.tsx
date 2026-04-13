@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/balanced-bites/SiteFooter";
 import { SiteHeader } from "@/components/balanced-bites/SiteHeader";
 import {
-  estimateCaloriesFromMacros,
-  parseGramsValue,
   parseNutritionFromDescription,
   stripEmbeddedNutritionFromDescription,
 } from "@/lib/parse-product-nutrition";
@@ -50,7 +48,6 @@ const PRODUCTS_QUERY = `
           }
           metafields(
             identifiers: [
-              { namespace: "custom", key: "calories" },
               { namespace: "custom", key: "protein" },
               { namespace: "custom", key: "fat" },
               { namespace: "custom", key: "carbs" },
@@ -119,14 +116,6 @@ function formatMacro(raw: string | undefined, suffix?: string): string {
   return v;
 }
 
-function formatCalories(raw: string | undefined): string {
-  if (raw == null || raw.trim() === "") return "—";
-  const v = raw.trim();
-  if (/kcal/i.test(v) || /\bcal\b/i.test(v)) return v;
-  if (/^\d+(\.\d+)?$/.test(v)) return `${v} kcal`;
-  return v;
-}
-
 function inferFilterKey(
   productType: string,
   tags: string[],
@@ -183,24 +172,6 @@ function serializeProduct(node: ProductNode): MenuProductSerialized {
   const fromDesc = parseNutritionFromDescription(descriptionRaw);
   const descriptionPlain = stripEmbeddedNutritionFromDescription(descriptionRaw);
 
-  const proteinG = parseGramsValue(mf.protein) ?? parseGramsValue(fromDesc.pro);
-  const carbsG = parseGramsValue(mf.carbs) ?? parseGramsValue(fromDesc.carb);
-  const fatG = parseGramsValue(mf.fat) ?? parseGramsValue(fromDesc.fat);
-
-  let calSource: string | undefined =
-    mf.calories != null && mf.calories.trim() !== "" ? mf.calories : undefined;
-  if (calSource == null && fromDesc.cal != null && fromDesc.cal.trim() !== "") {
-    calSource = fromDesc.cal;
-  }
-  if (
-    calSource == null &&
-    proteinG != null &&
-    carbsG != null &&
-    fatG != null
-  ) {
-    calSource = String(estimateCaloriesFromMacros(proteinG, carbsG, fatG));
-  }
-
   return {
     id: node.id,
     title: node.title,
@@ -214,7 +185,6 @@ function serializeProduct(node: ProductNode): MenuProductSerialized {
     imageAlt: image?.alt ?? node.title,
     categoryLabel: imageCategoryLabel(node.productType ?? "", node.tags ?? []),
     filterKey: inferFilterKey(node.productType ?? "", node.tags ?? []),
-    cal: formatCalories(calSource),
     pro: formatMacro(mf.protein ?? fromDesc.pro ?? undefined, "g"),
     fat: formatMacro(mf.fat ?? fromDesc.fat ?? undefined, "g"),
     carb: formatMacro(mf.carbs ?? fromDesc.carb ?? undefined, "g"),

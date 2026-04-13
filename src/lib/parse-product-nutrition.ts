@@ -5,7 +5,6 @@
  * literal "Protein:" substring, not a word boundary before it.
  */
 export type ParsedDescriptionNutrition = {
-  cal: string | null;
   pro: string | null;
   carb: string | null;
   fat: string | null;
@@ -19,31 +18,14 @@ function capture(re: RegExp, text: string): string | null {
 export function parseNutritionFromDescription(text: string): ParsedDescriptionNutrition {
   const t = text.replace(/\s+/g, " ").trim();
   if (t.length === 0) {
-    return { cal: null, pro: null, carb: null, fat: null };
+    return { pro: null, carb: null, fat: null };
   }
 
   const pro = capture(/Protein\s*:\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t);
   const carb = capture(/Carbs?\s*:\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t);
   const fat = capture(/Fat\s*:\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t);
 
-  let cal =
-    capture(/(?:Calories?|Energy|kcal)\s*:\s*(\d+(?:\.\d+)?)\s*(?:kcal|cal(?:ories)?)?/i, t) ??
-    capture(/\bCal\s*:\s*(\d+(?:\.\d+)?)\s*(?:kcal)?/i, t);
-
-  if (cal == null) {
-    cal = capture(/(\d+(?:\.\d+)?)\s*(?:kcal|calories)\b/i, t);
-  }
-
-  return { cal, pro, carb, fat };
-}
-
-/** Atwater general factors: 4 kcal/g protein & carbs, 9 kcal/g fat */
-export function estimateCaloriesFromMacros(
-  proteinG: number,
-  carbsG: number,
-  fatG: number,
-): number {
-  return Math.round(4 * proteinG + 4 * carbsG + 9 * fatG);
+  return { pro, carb, fat };
 }
 
 /**

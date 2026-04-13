@@ -72,16 +72,16 @@ export function MobileNav({ active, orderNowHref }: Props) {
           style={{ zIndex: Z_SIDEBAR }}
           aria-hidden={!open}
         >
-          <div className="flex items-center justify-end px-4 pt-4">
+          <div className="flex items-center justify-end px-5 pt-5">
             <button
               type="button"
               onClick={close}
               aria-label="Close menu"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 ring-1 ring-[#426237]/12 transition-colors hover:bg-white active:scale-[0.96]"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 ring-1 ring-[#426237]/12 transition-colors hover:bg-white active:scale-[0.96]"
             >
               <svg
-                width="16"
-                height="16"
+                width="20"
+                height="20"
                 viewBox="0 0 18 18"
                 fill="none"
                 aria-hidden
@@ -97,7 +97,7 @@ export function MobileNav({ active, orderNowHref }: Props) {
           </div>
 
           <nav
-            className="mt-2 flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
+            className="mt-3 flex flex-1 flex-col gap-1 overflow-y-auto px-4 pb-4"
             aria-label="Mobile navigation"
           >
             {NAV_ITEMS.map((item, i) => {
@@ -107,7 +107,7 @@ export function MobileNav({ active, orderNowHref }: Props) {
                   key={item.key}
                   href={item.href}
                   onClick={close}
-                  className={`rounded-xl px-3 py-2.5 text-[0.9375rem] font-semibold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                  className={`rounded-xl px-4 py-3.5 text-base font-semibold transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
                     isActive
                       ? "bg-[#426237]/12 text-[#426237]"
                       : "text-[#426237]/70 hover:bg-white/70 hover:text-[#426237]"
@@ -125,7 +125,7 @@ export function MobileNav({ active, orderNowHref }: Props) {
           </nav>
 
           <div
-            className="border-t border-[#426237]/10 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3"
+            className="border-t border-[#426237]/10 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4"
             style={{
               opacity: open ? 1 : 0,
               transform: open ? "translateY(0)" : "translateY(8px)",
@@ -136,7 +136,7 @@ export function MobileNav({ active, orderNowHref }: Props) {
             <Link
               href={orderNowHref}
               onClick={close}
-              className="flex h-10 items-center justify-center rounded-full bg-[#426237] px-5 text-sm font-semibold text-white shadow-sm transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#2c4224] active:scale-[0.98]"
+              className="flex min-h-12 items-center justify-center rounded-full bg-[#426237] px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-[#2c4224] active:scale-[0.98]"
             >
               Order Now
             </Link>
@@ -156,22 +156,22 @@ export function MobileNav({ active, orderNowHref }: Props) {
         }}
         aria-expanded={open}
         aria-label={open ? "Close menu" : "Open menu"}
-        className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/85 ring-1 ring-[#426237]/12 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white active:scale-[0.96] lg:hidden"
+        className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/85 ring-1 ring-[#426237]/12 transition-colors duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-white active:scale-[0.96] sm:h-11 sm:w-11 lg:hidden"
       >
-        <div className="flex w-[15px] flex-col items-center gap-[4px]">
+        <div className="flex w-[19px] flex-col items-center gap-[5px]">
           <span
-            className="block h-[2px] w-full rounded-full bg-[#426237] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            className="block h-[2.5px] w-full rounded-full bg-[#426237] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             style={
               open
-                ? { transform: "translateY(3px) rotate(45deg)" }
+                ? { transform: "translateY(3.75px) rotate(45deg)" }
                 : undefined
             }
           />
           <span
-            className="block h-[2px] w-full rounded-full bg-[#426237] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            className="block h-[2.5px] w-full rounded-full bg-[#426237] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             style={
               open
-                ? { transform: "translateY(-3px) rotate(-45deg)" }
+                ? { transform: "translateY(-3.75px) rotate(-45deg)" }
                 : undefined
             }
           />

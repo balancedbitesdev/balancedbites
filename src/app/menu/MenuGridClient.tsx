@@ -135,7 +135,6 @@ export function MenuGridClient({ products }: Props) {
                       Nutrition (per serving)
                     </p>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <MacroPill label="CAL" value={product.cal} />
                       <MacroPill label="PRO" value={product.pro} />
                       <MacroPill label="FAT" value={product.fat} />
                       <MacroPill label="CARB" value={product.carb} />

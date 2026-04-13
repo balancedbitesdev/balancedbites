@@ -27,41 +27,90 @@ function FeatureIndex({ n }: { n: number }) {
   );
 }
 
+/** Shared by all floating plates (hero salmon + beef + chicken + vegan): shadow + stacking. */
+const FLOATING_PLATE_SHADOW =
+  "h-auto w-full select-none drop-shadow-2xl [filter:drop-shadow(0_28px_50px_rgba(66,98,55,0.2))_drop-shadow(0_14px_28px_rgba(0,0,0,0.07))]";
+
+/**
+ * Anchoring model: `absolute` inside a `relative` column (hero salmon) or section (chicken, vegan),
+ * `pointer-events-none`, `z-20`, width via min(vw) ramp + responsive steps — then add position utilities.
+ */
+const FLOATING_PLATE_SHELL = "pointer-events-none absolute z-20 max-w-none";
+
+/** Hero salmon width ramp — desktop / `lg+` (bento column). */
+const FLOATING_PLATE_WIDTH_SALMON =
+  "w-[min(92vw,400px)] sm:w-[min(94vw,450px)] lg:w-[520px]";
+
+/** Hero salmon on phone/tablet: absolute top-right; larger than before, copy stays full width + higher z for readability. */
+const FLOATING_PLATE_WIDTH_SALMON_MOBILE =
+  "w-[min(54vw,220px)] sm:w-[min(50vw,260px)] md:w-[240px]";
+
+/** Secondary floating plates (chicken, vegan). Same min-vw pattern, one step down from salmon. */
+const FLOATING_PLATE_WIDTH_LG =
+  "w-[min(88vw,300px)] sm:w-[340px] lg:w-[380px]";
+
+/**
+ * Marquee beef — in-flow beside quote. Tighter on phone so copy stays readable in one row.
+ */
+const FLOATING_PLATE_WIDTH_BEEF =
+  "w-[min(30vw,108px)] shrink-0 sm:w-[200px] md:w-[240px] lg:w-[280px]";
+
 export default function Home() {
   return (
-    <div className="flex min-h-full flex-col bg-[#f4f1eb] font-sans text-[#426237]">
-      <SiteHeader active="home" orderNowHref="/menu" />
+    <div className="flex min-h-full flex-col overflow-x-clip bg-[#fffdf9] font-sans text-[#426237]">
+      <SiteHeader active="home" orderNowHref="/menu" warmCanvas />
 
       <main className="flex flex-1 flex-col">
         {/* ──────────────────── HERO (dedicated band) ──────────────────── */}
         <section
-          className="relative overflow-hidden border-b border-[#426237]/[0.08] bg-gradient-to-b from-[#fffdf9] via-[#f3eee4] to-[#e8e2d6] px-3 pb-14 pt-6 shadow-[inset_0_-1px_0_rgba(255,255,255,0.35)] sm:px-8 sm:pb-20 sm:pt-12"
+          className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#fffdf9] via-[#f5f0e8] to-[#ebe4d9] px-3 pb-14 pt-6 sm:px-8 sm:pb-20 sm:pt-12 lg:overflow-visible"
           aria-label="Introduction"
         >
+          
           <div
-            className="pointer-events-none absolute inset-0 opacity-[0.45]"
+            className="pointer-events-none absolute inset-0 opacity-[0.32]"
             aria-hidden
             style={{
               backgroundImage:
-                "radial-gradient(ellipse 120% 80% at 50% -20%, rgba(66,98,55,0.09), transparent 55%), radial-gradient(circle at 90% 20%, rgba(172,128,88,0.12), transparent 28%)",
+                "radial-gradient(ellipse 140% 90% at 50% -30%, rgba(66,98,55,0.06), transparent 50%), radial-gradient(circle at 92% 8%, rgba(172,128,88,0.09), transparent 32%)",
             }}
           />
+
           <div className="relative mx-auto max-w-6xl py-8 sm:py-12 lg:py-16">
             <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)] lg:items-center lg:gap-12">
-                  {/* Left — copy */}
+                  {/* Left — copy; mobile salmon layered top-right (full-width copy, plate absolute) */}
                   <div className="max-w-2xl">
-                    <div className="flex flex-wrap gap-2">
-                      <HeroChip label="Balanced Bites" />
-                      <HeroChip label="By Dalia Seoudi" />
+                    <div className="relative isolate">
+                      <div
+                        className={`pointer-events-none absolute -right-15 -top-3 z-[70] ${FLOATING_PLATE_WIDTH_SALMON_MOBILE} sm:-right-6 sm:top-1 md:-right-8 md:top-2 lg:hidden`}
+                        aria-hidden
+                      >
+                        <Image
+                          src="/hero-signature-plate.webp"
+                          alt=""
+                          width={640}
+                          height={640}
+                          sizes="(max-width: 640px) 220px, (max-width: 768px) 260px, 280px"
+                          className={FLOATING_PLATE_SHADOW}
+                          priority
+                        />
+                      </div>
+
+                      <div className="relative z-[60] w-full">
+                        <div className="flex flex-wrap gap-2">
+                          <HeroChip label="Balanced Bites" />
+                          <HeroChip label="By Dalia Seoudi" />
+                        </div>
+
+                        <h1 className="menu-serif mt-6 max-w-[11ch] text-[2.25rem] font-bold leading-[0.92] tracking-[-0.04em] text-[#426237] sm:text-[4.15rem] lg:text-[5.2rem]">
+                          Food for the Whole Family
+                        </h1>
+
+                        <p className="menu-script mt-3 text-[1.35rem] font-medium text-[#ac8058] sm:mt-4 sm:text-[2rem]">
+                          Healthy Living Made Simple
+                        </p>
+                      </div>
                     </div>
-
-                    <h1 className="menu-serif mt-6 max-w-[11ch] text-[2.25rem] font-bold leading-[0.92] tracking-[-0.04em] text-[#426237] sm:text-[4.15rem] lg:text-[5.2rem]">
-                      Food for the Whole Family
-                    </h1>
-
-                    <p className="menu-script mt-3 text-[1.35rem] font-medium text-[#ac8058] sm:mt-4 sm:text-[2rem]">
-                      Healthy Living Made Simple
-                    </p>
 
                     <p className="mt-4 max-w-xl text-pretty text-[0.94rem] leading-7 text-[#426237]/75 sm:mt-6 sm:text-lg">
                       Eating healthy isn&apos;t just for diets—it&apos;s for everyone at the table.
@@ -91,9 +140,9 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Right — bento cards */}
-                  <div className="relative">
-                    <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-2">
+                  {/* Right — bento + floating plate (cutout sits above cards, bleeds past column on lg+) */}
+                  <div className="relative overflow-visible lg:min-h-[320px]">
+                    <div className="relative z-10 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-2">
                       <div className="rounded-[1.5rem] bg-[#426237] p-1.5 shadow-[0_24px_50px_-30px_rgba(66,98,55,0.65)] ring-1 ring-[#426237]/10 sm:col-span-2 sm:rounded-[2rem]">
                         <div className="rounded-[calc(2rem-0.375rem)] bg-[linear-gradient(135deg,#4c6f3f_0%,#3a5630_100%)] px-5 py-5 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.14)]">
                           <div className="flex items-start justify-between gap-4">
@@ -149,13 +198,31 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
+
+                    {/*
+                      Hero plate (large viewports): same asset as mobile headline plate; absolute on bento column.
+                    */}
+                    <div
+                      className={`${FLOATING_PLATE_SHELL} -right-6 top-16 hidden sm:-right-8 sm:top-20 ${FLOATING_PLATE_WIDTH_SALMON} lg:block lg:-right-[8.75rem] lg:top-80`}
+                      aria-hidden
+                    >
+                      <Image
+                        src="/hero-signature-plate.webp"
+                        alt=""
+                        width={800}
+                        height={800}
+                        sizes="(max-width: 1024px) 0px, 520px"
+                        className={FLOATING_PLATE_SHADOW}
+                        priority
+                      />
+                    </div>
                   </div>
                 </div>
           </div>
         </section>
 
         {/* ──────────────── WHAT WE BELIEVE ──────────────── */}
-        <section className="bg-[#f4f1eb] px-3 pb-16 pt-4 sm:px-8 sm:pb-28 sm:pt-6">
+        <section className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#ede9e2] to-[#f4f1eb] px-3 pb-16 pt-6 sm:px-8 sm:pb-28 sm:pt-8">
           <div className="mx-auto max-w-5xl">
             <ScrollReveal className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]">
@@ -215,7 +282,7 @@ export default function Home() {
 
         {/* ──────────── MARQUEE QUOTE ──────────── */}
         <ScrollReveal variant="fade">
-          <section className="relative overflow-hidden bg-[#426237] py-14 sm:py-16">
+          <section className="relative overflow-hidden bg-[#426237] py-12 sm:py-16">
             <div
               className="pointer-events-none absolute inset-0 opacity-30"
               aria-hidden
@@ -224,21 +291,36 @@ export default function Home() {
                   "radial-gradient(circle at 20% 50%, rgba(255,255,255,0.12), transparent 35%), radial-gradient(circle at 80% 50%, rgba(172,128,88,0.14), transparent 35%)",
               }}
             />
-            <div className="relative mx-auto max-w-3xl px-6 text-center">
-              <p className="menu-serif text-[1.75rem] font-bold leading-snug text-white sm:text-[2.25rem] md:text-[2.75rem]">
-                &ldquo;One kitchen. One menu.
-                <br />
-                <span className="text-[#d4b896]">Healthy for everyone.</span>&rdquo;
-              </p>
-              <p className="mt-5 text-sm text-white/55">
-                The idea behind everything we cook.
-              </p>
+            <div className="relative mx-auto flex max-w-6xl flex-row items-center gap-3 px-3 sm:gap-8 sm:px-8 lg:gap-12 lg:px-10">
+              <div
+                className={`pointer-events-none ${FLOATING_PLATE_WIDTH_BEEF}`}
+                aria-hidden
+              >
+                <Image
+                  src="/beef.webp"
+                  alt=""
+                  width={600}
+                  height={600}
+                  sizes="(max-width: 640px) 108px, (max-width: 768px) 200px, (max-width: 1024px) 240px, 280px"
+                  className={FLOATING_PLATE_SHADOW}
+                />
+              </div>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="menu-serif text-[clamp(1.05rem,3.6vw+0.35rem,2.75rem)] font-bold leading-[1.2] text-white sm:leading-snug">
+                  &ldquo;One kitchen. One menu.
+                  <br />
+                  <span className="text-[#d4b896]">Healthy for everyone.</span>&rdquo;
+                </p>
+                <p className="mt-3 text-xs leading-relaxed text-white/55 sm:mt-5 sm:text-sm">
+                  The idea behind everything we cook.
+                </p>
+              </div>
             </div>
           </section>
         </ScrollReveal>
 
         {/* ──────────── CLEAN KETO ──────────── */}
-        <section className="px-3 py-14 sm:px-8 sm:py-28">
+        <section className="relative overflow-x-clip overflow-y-visible px-3 py-14 sm:px-8 sm:py-28">
           <div className="mx-auto max-w-5xl">
             <div className="grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,1.15fr)] lg:gap-16">
               <ScrollReveal variant="slide-left">
@@ -356,11 +438,25 @@ export default function Home() {
               </ScrollReveal>
             </div>
           </div>
+
+          <div
+            className={`${FLOATING_PLATE_SHELL} ${FLOATING_PLATE_WIDTH_LG} -right-4 top-24 hidden sm:top-20 lg:right-[-8%] lg:top-16 lg:block`}
+            aria-hidden
+          >
+            <Image
+              src="/grilled-chicken.webp"
+              alt=""
+              width={800}
+              height={800}
+              sizes="(max-width: 1024px) 0px, 380px"
+              className={FLOATING_PLATE_SHADOW}
+            />
+          </div>
         </section>
 
         {/* ──────────── CTA BAND ──────────── */}
         <ScrollReveal variant="scale">
-          <section className="px-3 pb-16 sm:px-8 sm:pb-28">
+          <section className="relative overflow-x-clip overflow-y-visible px-3 pb-16 sm:px-8 sm:pb-28">
             <div className="mx-auto max-w-4xl">
               <div className="relative overflow-hidden rounded-[2.5rem] bg-[#f8f4ed] p-2 shadow-[0_30px_80px_-40px_rgba(66,98,55,0.3)] ring-1 ring-[#426237]/10 sm:p-3">
                 <div className="relative overflow-hidden rounded-[calc(2.5rem-0.5rem)] bg-[linear-gradient(135deg,#fffdf8_0%,#f7f2e8_45%,#f3eee4_100%)] px-6 py-12 text-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.65)] sm:px-10 sm:py-16">
@@ -403,6 +499,20 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div
+              className={`${FLOATING_PLATE_SHELL} ${FLOATING_PLATE_WIDTH_LG} -left-4 bottom-8 hidden sm:bottom-12 lg:left-[-4%] lg:bottom-16 lg:block`}
+              aria-hidden
+            >
+              <Image
+                src="/vegan.webp"
+                alt=""
+                width={800}
+                height={800}
+                sizes="(max-width: 1024px) 0px, 380px"
+                className={FLOATING_PLATE_SHADOW}
+              />
             </div>
           </section>
         </ScrollReveal>
