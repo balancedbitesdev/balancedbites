@@ -1,31 +1,8 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/balanced-bites/SiteFooter";
 import { SiteHeader } from "@/components/balanced-bites/SiteHeader";
-import { shopifyFetch } from "@/lib/shopify";
 
-export default async function Home() {
-  const query = `
-    query {
-      product(handle: "brownies") {
-        title
-        description
-        priceRange {
-          minVariantPrice {
-            amount
-            currencyCode
-          }
-        }
-      }
-    }
-  `;
-
-  const response = await shopifyFetch({ query });
-  const product =
-    response && "body" in response && response.body != null
-      ? (response.body as { data?: { product?: { title: string } | null } }).data
-          ?.product
-      : undefined;
-
+export default function Home() {
   const orderNowHref = "/menu";
 
   return (
@@ -43,8 +20,8 @@ export default async function Home() {
             Healthy Living Made Simple
           </p>
           <p className="mt-4 text-pretty text-sm leading-relaxed text-gray-600">
-            Balanced Bites brings nutritionist-approved meals and desserts to your table—so every
-            generation can eat well without the hassle.
+            Nutritionist-approved meals and desserts—so every generation can eat well without the
+            hassle.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -60,23 +37,6 @@ export default async function Home() {
             >
               Browse menu
             </Link>
-          </div>
-
-          <div className="mt-10 border-t border-[#426237]/10 pt-8 text-left">
-            <p className="text-center text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Store connection
-            </p>
-            {product ? (
-              <p className="mt-3 text-center text-sm text-[#426237]">
-                Connected. Featured item:{" "}
-                <span className="font-semibold">{product.title}</span>
-              </p>
-            ) : (
-              <p className="mt-3 text-center text-sm text-gray-600">
-                Shopify product &ldquo;brownies&rdquo; not returned. Check the handle in Admin and
-                your API credentials.
-              </p>
-            )}
           </div>
         </div>
       </main>

@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
       ? tokenData.expires_in
       : 60 * 60 * 24;
 
-  const ok = redirectToAccount(request, "?auth_success=1");
+  const ok = redirectToAccount(request, "");
   ok.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
   ok.cookies.set(CUSTOMER_ACCOUNT_TOKEN_COOKIE, tokenData.access_token, {
     httpOnly: true,

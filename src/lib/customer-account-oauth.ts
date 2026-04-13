@@ -24,6 +24,11 @@ function storefrontHost(): string | null {
   return raw.replace(/^https?:\/\//i, "").split("/")[0]?.replace(/\/$/, "") ?? null;
 }
 
+/** Storefront host for `/.well-known/*` discovery (Customer Account API GraphQL URL). */
+export function customerAccountDiscoveryHost(): string | null {
+  return storefrontHost();
+}
+
 /** Host that serves `/.well-known/openid-configuration` (usually your primary storefront domain). */
 export function openIdConfigurationUrl(): string | null {
   const host = storefrontHost();
@@ -106,6 +111,8 @@ export function buildAuthorizationUrl(
     redirectUri: string;
     state: string;
     codeChallenge: string;
+    /** `signup` adds `screen_hint=signup` when the IdP supports it. */
+    authIntent?: "signup" | "login";
   },
 ): string {
   const authUrl = new URL(authorizationEndpoint);
@@ -116,6 +123,10 @@ export function buildAuthorizationUrl(
   authUrl.searchParams.set("state", params.state);
   authUrl.searchParams.set("code_challenge", params.codeChallenge);
   authUrl.searchParams.set("code_challenge_method", "S256");
+  authUrl.searchParams.set("prompt", "login");
+  if (params.authIntent === "signup") {
+    authUrl.searchParams.set("screen_hint", "signup");
+  }
   return authUrl.toString();
 }
 
