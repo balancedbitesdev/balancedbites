@@ -15,9 +15,12 @@ export function isValidShopifyProductVariantGid(id: string): boolean {
   return /^gid:\/\/shopify\/ProductVariant\/\d+$/.test(id);
 }
 
+/** Cart line IDs may include a `?key=` suffix (Storefront API). Match cart-style safety checks. */
 export function isValidShopifyCartLineGid(id: string): boolean {
-  if (id.length > MAX_GID_LEN) return false;
-  return /^gid:\/\/shopify\/CartLine\/\d+$/.test(id);
+  if (id.length < 24 || id.length > MAX_GID_LEN) return false;
+  if (!id.startsWith("gid://shopify/CartLine/")) return false;
+  if (/[\s<>'"\\]/.test(id)) return false;
+  return true;
 }
 
 export const MAX_CART_LINES_PER_REQUEST = 40;

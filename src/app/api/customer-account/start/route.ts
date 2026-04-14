@@ -9,6 +9,9 @@ import {
   generateCodeVerifier,
   generateOAuthState,
 } from "@/lib/customer-account-oauth";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("api.oauth.start");
 
 export async function GET(request: Request) {
   const startUrl = new URL(request.url);
@@ -20,6 +23,7 @@ export async function GET(request: Request) {
   const redirectUri = customerAccountCallbackUrl();
 
   if (clientId == null || clientId === "" || redirectUri == null) {
+    log.error("oauth_start_not_configured");
     return NextResponse.json(
       {
         error:
@@ -31,6 +35,7 @@ export async function GET(request: Request) {
 
   const openid = await fetchOpenIdConfiguration();
   if (openid == null) {
+    log.error("oauth_openid_discovery_failed");
     return NextResponse.json(
       {
         error:
@@ -51,6 +56,8 @@ export async function GET(request: Request) {
     codeChallenge: challenge,
     authIntent,
   });
+
+  log.info("oauth_redirect_to_provider", { intent: authIntent });
 
   const res = NextResponse.redirect(authUrl);
   res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");

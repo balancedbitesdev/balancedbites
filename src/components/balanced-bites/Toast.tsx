@@ -13,10 +13,12 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-type ToastItem = { id: string; message: string };
+type ToastItem = { id: string; message: string; tone: "success" | "soft" };
 
 type ToastContextValue = {
   show: (message: string) => void;
+  /** Calm copy for recoverable issues — no alarm styling */
+  showSoft: (message: string) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -49,17 +51,31 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.filter((x) => x.id !== id));
   }, []);
 
-  const show = useCallback(
-    (message: string) => {
+  const push = useCallback(
+    (message: string, tone: ToastItem["tone"]) => {
       const id =
         typeof crypto !== "undefined" && "randomUUID" in crypto
           ? crypto.randomUUID()
           : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-      setItems((prev) => [...prev, { id, message }]);
+      setItems((prev) => [...prev, { id, message, tone }]);
       const tid = setTimeout(() => remove(id), TOAST_MS);
       timeouts.current.set(id, tid);
     },
     [remove],
+  );
+
+  const show = useCallback(
+    (message: string) => {
+      push(message, "success");
+    },
+    [push],
+  );
+
+  const showSoft = useCallback(
+    (message: string) => {
+      push(message, "soft");
+    },
+    [push],
   );
 
   useEffect(() => {
@@ -70,7 +86,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const value = useMemo(() => ({ show }), [show]);
+  const value = useMemo(() => ({ show, showSoft }), [show, showSoft]);
 
   return (
     <ToastContext.Provider value={value}>
@@ -98,28 +114,43 @@ function ToastViewport({
       aria-label="Notifications"
       className="pointer-events-none fixed bottom-4 right-4 z-[1080] flex max-w-[min(calc(100vw-2rem),20rem)] flex-col gap-2 sm:bottom-6 sm:right-6"
     >
-      {items.map((t) => (
-        <div
-          key={t.id}
-          role="status"
-          className="pointer-events-auto bb-toast-enter rounded-2xl border border-[#426237]/12 bg-white/95 px-4 py-3 text-sm font-medium text-[#426237] shadow-[0_20px_50px_-24px_rgba(66,98,55,0.45)] ring-1 ring-[#426237]/8 backdrop-blur-sm"
-        >
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#426237]/10 text-xs">
-              ✓
-            </span>
-            <p className="min-w-0 flex-1 leading-snug">{t.message}</p>
-            <button
-              type="button"
-              onClick={() => onDismiss(t.id)}
-              className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#426237]/50 transition-[color,transform] duration-150 ease-out hover:bg-[#426237]/8 hover:text-[#426237] active:scale-95"
-              aria-label="Dismiss notification"
-            >
-              ×
-            </button>
+      {items.map((t) => {
+        const soft = t.tone === "soft";
+        return (
+          <div
+            key={t.id}
+            role="status"
+            className={`pointer-events-auto bb-toast-enter rounded-2xl border px-4 py-3 text-sm font-medium shadow-[0_20px_50px_-24px_rgba(66,98,55,0.45)] backdrop-blur-sm ${
+              soft
+                ? "border-stone-200/90 bg-[#faf9f6]/98 text-stone-700 ring-1 ring-stone-200/60"
+                : "border-[#426237]/12 bg-white/95 text-[#426237] ring-1 ring-[#426237]/8"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <span
+                className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
+                  soft ? "bg-stone-200/80 text-stone-600" : "bg-[#426237]/10"
+                }`}
+              >
+                {soft ? "·" : "✓"}
+              </span>
+              <p className="min-w-0 flex-1 leading-snug">{t.message}</p>
+              <button
+                type="button"
+                onClick={() => onDismiss(t.id)}
+                className={`-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-[color,transform] duration-150 ease-out active:scale-[0.97] ${
+                  soft
+                    ? "text-stone-400 hover:bg-stone-200/60 hover:text-stone-600"
+                    : "text-[#426237]/50 hover:bg-[#426237]/8 hover:text-[#426237]"
+                }`}
+                aria-label="Dismiss notification"
+              >
+                ×
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

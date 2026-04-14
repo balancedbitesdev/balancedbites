@@ -94,9 +94,17 @@ body {
   animation: bb-cart-bump 420ms cubic-bezier(0.34, 1.45, 0.64, 1) both;
 }
 
+.bb-cart-drawer-panel {
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bb-toast-enter,
   .bb-cart-bump {
     animation: none;
+  }
+
+  .bb-cart-drawer-panel {
+    transition: none !important;
   }
 }

@@ -54,7 +54,7 @@ export function CartNavButton() {
       }}
       aria-expanded={open}
       aria-controls="bb-cart-drawer"
-      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-[background-color,color,box-shadow,transform] duration-200 ease-out hover:shadow-[0_10px_28px_-16px_rgba(66,98,55,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-95 sm:h-11 sm:w-11 lg:h-11 lg:w-11 ${
+      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-[background-color,color,box-shadow,transform] duration-200 ease-out hover:shadow-[0_10px_28px_-16px_rgba(66,98,55,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-[0.97] sm:h-11 sm:w-11 lg:h-11 lg:w-11 ${
         looksActive
           ? "bg-[#426237] text-white shadow-[0_12px_28px_-14px_rgba(66,98,55,0.55)]"
           : "bg-white/85 text-[#426237] ring-1 ring-[#426237]/12 hover:bg-white"

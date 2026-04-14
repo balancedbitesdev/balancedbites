@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   description:
     "Health-focused meals and desserts—delivery in 6th October & Sheikh Zayed, Saturday pickup, and personalized nutrition plans.",
   icons: {
-    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: [{ url: "/favicon (3).ico", type: "image/x-icon" }],
+    shortcut: "/favicon (3).ico",
+    apple: "/favicon (3).ico",
   },
 };
 

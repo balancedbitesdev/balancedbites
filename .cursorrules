@@ -1,0 +1,4 @@
+# Terminal & Build Execution Rules
+- NEVER automatically run build commands (e.g., `npm run build`, `npm run dev`, `yarn build`) after writing or modifying code.
+- NEVER execute terminal commands automatically without my explicit permission.
+- Only provide the code changes or the commands I need to run, and wait for me to manually trigger the build or execution.

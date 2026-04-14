@@ -6,8 +6,10 @@ import {
   isValidShopifyCartLineGid,
   isValidShopifyProductVariantGid,
 } from "@/lib/cart-input-validation";
+import { createLogger, truncateGid } from "@/lib/logger";
 import {
   BB_CART_COOKIE,
+  bbCartCookieOptions,
   storefrontCartLinesAdd,
   storefrontCartLinesRemove,
   storefrontCartLinesUpdate,
@@ -15,36 +17,40 @@ import {
   storefrontGetCart,
 } from "@/lib/shopify-cart";
 
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+const log = createLogger("api.cart");
 
-function cookieOptions() {
-  return {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax" as const,
-    path: "/",
-    maxAge: COOKIE_MAX_AGE,
-  };
+const NO_STORE_HEADERS = {
+  "Cache-Control": "private, no-store, must-revalidate",
+  Vary: "Cookie",
+} as const;
+
+function withCartCacheHeaders(res: NextResponse) {
+  for (const [k, v] of Object.entries(NO_STORE_HEADERS)) {
+    res.headers.set(k, v);
+  }
+  return res;
 }
 
 export async function GET() {
   const jar = await cookies();
   const cartId = jar.get(BB_CART_COOKIE)?.value;
   if (cartId == null || cartId.length === 0) {
-    return NextResponse.json({ cart: null });
+    return withCartCacheHeaders(NextResponse.json({ cart: null }));
   }
   if (!isValidShopifyCartGid(cartId)) {
+    log.warn("get_cart_cookie_invalid", { cartId: truncateGid(cartId) });
     const res = NextResponse.json({ cart: null });
     res.cookies.delete(BB_CART_COOKIE);
-    return res;
+    return withCartCacheHeaders(res);
   }
   const cart = await storefrontGetCart(cartId);
   if (cart == null) {
+    log.warn("get_cart_shopify_miss", { cartId: truncateGid(cartId) });
     const res = NextResponse.json({ cart: null });
     res.cookies.delete(BB_CART_COOKIE);
-    return res;
+    return withCartCacheHeaders(res);
   }
-  return NextResponse.json({ cart });
+  return withCartCacheHeaders(NextResponse.json({ cart }));
 }
 
 export async function POST(req: Request) {
@@ -58,7 +64,10 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    log.warn("post_body_invalid_json");
+    return withCartCacheHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 }),
+    );
   }
 
   const jar = await cookies();
@@ -85,39 +94,58 @@ export async function POST(req: Request) {
       Math.max(1, Math.floor(Number(body.quantity) || 1)),
     );
     if (merchandiseId == null || merchandiseId.length === 0) {
-      return NextResponse.json({ error: "merchandiseId required" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "merchandiseId required" }, { status: 400 }),
+      );
     }
     if (!isValidShopifyProductVariantGid(merchandiseId)) {
-      return NextResponse.json({ error: "Invalid merchandiseId" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "Invalid merchandiseId" }, { status: 400 }),
+      );
     }
     const id = await ensureCart();
     if (id == null) {
-      return NextResponse.json({ error: "Could not create cart" }, { status: 502 });
+      log.error("add_cart_create_failed");
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "Could not create cart" }, { status: 502 }),
+      );
     }
     const { cart, errors } = await storefrontCartLinesAdd(id, [
       { merchandiseId, quantity },
     ]);
     if (errors.length > 0 || cart == null) {
-      return NextResponse.json(
-        { error: errors[0] ?? "Add to cart failed" },
-        { status: 400 },
+      log.warn("add_lines_shopify_error", {
+        cartId: truncateGid(id),
+        detail: errors[0] ?? "null_cart",
+      });
+      return withCartCacheHeaders(
+        NextResponse.json(
+          { error: errors[0] ?? "Add to cart failed" },
+          { status: 400 },
+        ),
       );
     }
     const res = NextResponse.json({ cart });
-    res.cookies.set(BB_CART_COOKIE, cart.id, cookieOptions());
-    return res;
+    res.cookies.set(BB_CART_COOKIE, cart.id, bbCartCookieOptions());
+    return withCartCacheHeaders(res);
   }
 
   if (body.action === "update") {
     if (cartId == null || !isValidShopifyCartGid(cartId)) {
-      return NextResponse.json({ error: "No cart" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "No cart" }, { status: 400 }),
+      );
     }
     const lines = body.lines;
     if (!Array.isArray(lines) || lines.length === 0) {
-      return NextResponse.json({ error: "lines required" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "lines required" }, { status: 400 }),
+      );
     }
     if (lines.length > MAX_CART_LINES_PER_REQUEST) {
-      return NextResponse.json({ error: "Too many lines" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "Too many lines" }, { status: 400 }),
+      );
     }
     const normalized = lines.map((line) => ({
       id: String(line.id),
@@ -125,50 +153,75 @@ export async function POST(req: Request) {
     }));
     for (const line of normalized) {
       if (!isValidShopifyCartLineGid(line.id)) {
-        return NextResponse.json({ error: "Invalid line id" }, { status: 400 });
+        return withCartCacheHeaders(
+          NextResponse.json({ error: "Invalid line id" }, { status: 400 }),
+        );
       }
     }
     const { cart, errors } = await storefrontCartLinesUpdate(cartId, normalized);
     if (errors.length > 0 || cart == null) {
-      return NextResponse.json(
-        { error: errors[0] ?? "Update failed" },
-        { status: 400 },
+      log.warn("update_lines_shopify_error", {
+        cartId: truncateGid(cartId),
+        detail: errors[0] ?? "null_cart",
+      });
+      return withCartCacheHeaders(
+        NextResponse.json(
+          { error: errors[0] ?? "Update failed" },
+          { status: 400 },
+        ),
       );
     }
     const res = NextResponse.json({ cart });
-    res.cookies.set(BB_CART_COOKIE, cart.id, cookieOptions());
-    return res;
+    res.cookies.set(BB_CART_COOKIE, cart.id, bbCartCookieOptions());
+    return withCartCacheHeaders(res);
   }
 
   if (body.action === "remove") {
     if (cartId == null || !isValidShopifyCartGid(cartId)) {
-      return NextResponse.json({ error: "No cart" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "No cart" }, { status: 400 }),
+      );
     }
     const lineIds = body.lineIds;
     if (!Array.isArray(lineIds) || lineIds.length === 0) {
-      return NextResponse.json({ error: "lineIds required" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "lineIds required" }, { status: 400 }),
+      );
     }
     if (lineIds.length > MAX_CART_LINES_PER_REQUEST) {
-      return NextResponse.json({ error: "Too many lineIds" }, { status: 400 });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: "Too many lineIds" }, { status: 400 }),
+      );
     }
     const ids = lineIds.map((id) => String(id));
     for (const id of ids) {
       if (!isValidShopifyCartLineGid(id)) {
-        return NextResponse.json({ error: "Invalid line id" }, { status: 400 });
+        return withCartCacheHeaders(
+          NextResponse.json({ error: "Invalid line id" }, { status: 400 }),
+        );
       }
     }
     const { cart, errors } = await storefrontCartLinesRemove(cartId, ids);
     if (errors.length > 0) {
-      return NextResponse.json({ error: errors[0] }, { status: 400 });
+      log.warn("remove_lines_shopify_error", {
+        cartId: truncateGid(cartId),
+        detail: errors[0],
+      });
+      return withCartCacheHeaders(
+        NextResponse.json({ error: errors[0] }, { status: 400 }),
+      );
     }
     const res = NextResponse.json({ cart });
     if (cart == null || cart.totalQuantity === 0) {
       res.cookies.delete(BB_CART_COOKIE);
     } else {
-      res.cookies.set(BB_CART_COOKIE, cart.id, cookieOptions());
+      res.cookies.set(BB_CART_COOKIE, cart.id, bbCartCookieOptions());
     }
-    return res;
+    return withCartCacheHeaders(res);
   }
 
-  return NextResponse.json({ error: "Unknown action" }, { status: 400 });
+  log.warn("post_unknown_action", { action: body.action });
+  return withCartCacheHeaders(
+    NextResponse.json({ error: "Unknown action" }, { status: 400 }),
+  );
 }

@@ -18,7 +18,9 @@ import {
   postCartMutation,
   subscribeCartUpdated,
 } from "@/lib/cart-client-api";
+import { getDeliveryFeeEgp } from "@/lib/delivery-fee";
 import type { CartPayload } from "@/lib/shopify-cart";
+import { useToast } from "@/components/balanced-bites/Toast";
 import { useMobileMenu } from "./MobileMenuContext";
 
 type CartDrawerContextValue = {
@@ -79,6 +81,7 @@ function formatMoney(amount: string, currencyCode: string): string {
 export function CartDrawer() {
   const { open, setOpen } = useCartDrawer();
   const { open: mobileMenuOpen } = useMobileMenu();
+  const { showSoft } = useToast();
   const router = useRouter();
   const [cart, setCart] = useState<CartPayload | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -114,13 +117,43 @@ export function CartDrawer() {
   );
 
   const total = cart?.cost?.totalAmount;
+  const subtotal = cart?.cost?.subtotalAmount ?? cart?.cost?.totalAmount;
 
-  async function post(body: object) {
+  const pricing = useMemo(() => {
+    if (subtotal == null) return null;
+    const currency = subtotal.currencyCode;
+    const deliveryEgp = getDeliveryFeeEgp();
+    if (currency !== "EGP" || deliveryEgp <= 0) {
+      return {
+        kind: "simple" as const,
+        label: "Estimated total",
+        amount: subtotal.amount,
+        currencyCode: currency,
+        note: "Delivery & taxes are finalized at checkout.",
+      };
+    }
+    const items = Number.parseFloat(subtotal.amount);
+    if (!Number.isFinite(items)) return null;
+    const estimated = items + deliveryEgp;
+    return {
+      kind: "egp" as const,
+      items,
+      deliveryEgp,
+      estimated,
+      currencyCode: currency,
+    };
+  }, [subtotal]);
+
+  async function post(body: object): Promise<boolean> {
     const result = await postCartMutation(body);
-    if (!result.ok) throw new Error(result.error);
+    if (!result.ok) {
+      showSoft(result.error);
+      return false;
+    }
     setCart(result.cart);
     dispatchCartUpdated();
     router.refresh();
+    return true;
   }
 
   async function setQty(lineId: string, quantity: number) {
@@ -128,13 +161,11 @@ export function CartDrawer() {
     const q = Math.min(99, Math.max(1, quantity));
     setBusy(lineId);
     try {
-      await post({
+      const ok = await post({
         action: "update",
         lines: [{ id: lineId, quantity: q }],
       });
-    } catch (e) {
-      console.error(e);
-      alert(e instanceof Error ? e.message : "Could not update");
+      if (!ok) void load();
     } finally {
       setBusy(null);
     }
@@ -144,10 +175,8 @@ export function CartDrawer() {
     if (!cart?.id) return;
     setBusy(lineId);
     try {
-      await post({ action: "remove", lineIds: [lineId] });
-    } catch (e) {
-      console.error(e);
-      alert(e instanceof Error ? e.message : "Could not remove");
+      const ok = await post({ action: "remove", lineIds: [lineId] });
+      if (!ok) void load();
     } finally {
       setBusy(null);
     }
@@ -155,14 +184,14 @@ export function CartDrawer() {
 
   return (
     <div
-      className={`fixed inset-0 z-[1070] transition-[visibility] duration-300 ${
-        open ? "visible" : "pointer-events-none invisible delay-300"
+      className={`fixed inset-0 z-[1070] transition-[visibility] duration-[260ms] ${
+        open ? "visible" : "pointer-events-none invisible delay-[260ms]"
       }`}
       aria-hidden={!open}
     >
       <button
         type="button"
-        className={`absolute inset-0 bg-[#1a1a1a]/45 backdrop-blur-[2px] transition-opacity duration-300 ease-out ${
+        className={`absolute inset-0 bg-[#1a1a1a]/45 backdrop-blur-[2px] transition-opacity duration-[260ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${
           open ? "opacity-100" : "opacity-0"
         }`}
         onClick={() => setOpen(false)}
@@ -175,7 +204,7 @@ export function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Shopping cart"
-        className={`absolute right-0 top-0 flex h-full w-full max-w-[min(75vw,28rem)] flex-col bg-[#f4f1eb] shadow-2xl ring-1 ring-[#426237]/15 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`bb-cart-drawer-panel absolute right-0 top-0 flex h-full w-full max-w-[min(75vw,28rem)] flex-col bg-[#f4f1eb] shadow-2xl ring-1 ring-[#426237]/15 transition-transform duration-[260ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -184,7 +213,7 @@ export function CartDrawer() {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-[#426237] ring-1 ring-[#426237]/15 transition-[background-color,color,transform] duration-150 ease-out hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-95"
+            className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-[#426237] ring-1 ring-[#426237]/15 transition-[background-color,color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-[0.97]"
             aria-label="Close cart"
           >
             <CloseIcon className="h-5 w-5" />
@@ -207,7 +236,7 @@ export function CartDrawer() {
               <Link
                 href="/menu"
                 onClick={() => setOpen(false)}
-                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.55)] transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95"
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.55)] transition-[background-color,box-shadow,transform] duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97]"
               >
                 Browse menu
               </Link>
@@ -239,27 +268,37 @@ export function CartDrawer() {
                         <p className="text-xs text-gray-500">{m.title}</p>
                       ) : null}
                       <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <label className="flex items-center gap-1 text-xs text-gray-600">
-                          Qty
-                          <input
-                            key={`${line.id}-${line.quantity}`}
-                            type="number"
-                            min={1}
-                            max={99}
+                        <div className="flex items-center gap-1.5 rounded-full bg-[#f4f1eb] p-0.5 ring-1 ring-[#426237]/12">
+                          <button
+                            type="button"
                             disabled={isBusy}
-                            defaultValue={line.quantity}
-                            onBlur={(e) => {
-                              const v = Math.floor(Number(e.target.value) || 1);
-                              if (v !== line.quantity) void setQty(line.id, v);
+                            onClick={() => {
+                              if (line.quantity <= 1) void removeLine(line.id);
+                              else void setQty(line.id, line.quantity - 1);
                             }}
-                            className="w-14 rounded-md border border-[#426237]/20 bg-[#f4f1eb] px-1 py-0.5 text-center text-xs font-semibold outline-none transition-[border-color,box-shadow] duration-150 ease-out focus:border-[#426237]/35 focus:ring-2 focus:ring-[#426237]/25 focus:ring-offset-1 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
-                          />
-                        </label>
+                            className="flex h-8 min-w-8 items-center justify-center rounded-full text-sm font-semibold text-[#426237] transition-[background-color,color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.97]"
+                            aria-label={line.quantity <= 1 ? "Remove item" : "Decrease quantity"}
+                          >
+                            −
+                          </button>
+                          <span className="min-w-[1.75rem] text-center text-xs font-bold tabular-nums text-[#426237]">
+                            {line.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            disabled={isBusy || line.quantity >= 99}
+                            onClick={() => void setQty(line.id, line.quantity + 1)}
+                            className="flex h-8 min-w-8 items-center justify-center rounded-full text-sm font-semibold text-[#426237] transition-[background-color,color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.97]"
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
                         <button
                           type="button"
                           disabled={isBusy}
                           onClick={() => void removeLine(line.id)}
-                          className="text-xs font-semibold text-red-700 underline-offset-2 transition-[opacity,transform] duration-150 ease-out hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 focus-visible:ring-offset-1 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-45 active:scale-95"
+                          className="text-xs font-semibold text-[#6b5b4d] underline-offset-2 transition-[color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-[#426237] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/25 focus-visible:ring-offset-1 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.97]"
                         >
                           Remove
                         </button>
@@ -280,21 +319,59 @@ export function CartDrawer() {
 
         {cart != null && lines.length > 0 ? (
           <div className="border-t border-[#426237]/10 bg-[#f4f1eb]/95 px-5 py-4 backdrop-blur-sm">
-            <div className="flex items-center justify-between text-[#426237]">
-              <span className="text-sm font-semibold">Estimated total</span>
-              <span className="text-lg font-bold tabular-nums">
-                {total != null ? formatMoney(total.amount, total.currencyCode) : "—"}
-              </span>
-            </div>
+            {pricing?.kind === "egp" ? (
+              <div className="space-y-2 text-[#426237]">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Items</span>
+                  <span className="tabular-nums font-medium">
+                    {formatMoney(String(pricing.items), pricing.currencyCode)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Delivery</span>
+                  <span className="tabular-nums font-medium">
+                    {formatMoney(String(pricing.deliveryEgp), pricing.currencyCode)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-t border-[#426237]/10 pt-2">
+                  <span className="text-sm font-semibold">Estimated total</span>
+                  <span className="text-lg font-bold tabular-nums">
+                    {formatMoney(String(pricing.estimated), pricing.currencyCode)}
+                  </span>
+                </div>
+                {/* <p className="text-[11px] leading-snug text-gray-500">
+                  Matches flat delivery in Shopify Checkout when configured. Tax may still apply at
+                  checkout unless your prices include tax—see store settings.
+                </p> */}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between text-[#426237]">
+                <span className="text-sm font-semibold">
+                  {pricing?.label ?? "Estimated total"}
+                </span>
+                <span className="text-lg font-bold tabular-nums">
+                  {subtotal != null
+                    ? formatMoney(subtotal.amount, subtotal.currencyCode)
+                    : total != null
+                      ? formatMoney(total.amount, total.currencyCode)
+                      : "—"}
+                </span>
+              </div>
+            )}
+            {pricing?.kind === "simple" && pricing.note != null ? (
+              <p className="mt-2 text-[11px] leading-snug text-gray-500">{pricing.note}</p>
+            ) : null}
             {cart.checkoutUrl ? (
               <a
                 href={cart.checkoutUrl}
-                className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full bg-[#426237] px-6 text-center text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.65)] transition-[background-color,box-shadow,transform] duration-200 ease-out hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-95"
+                className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full bg-[#426237] px-6 text-center text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.65)] transition-[background-color,box-shadow,transform] duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-[0.97]"
               >
                 Proceed to secure checkout
               </a>
             ) : (
-              <p className="mt-4 text-center text-sm text-red-700">Checkout is temporarily unavailable.</p>
+              <p className="mt-4 text-center text-sm text-stone-600">
+                Checkout will be ready in a moment—feel free to keep browsing.
+              </p>
             )}
           </div>
         ) : null}

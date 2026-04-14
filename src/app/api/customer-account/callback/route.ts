@@ -6,6 +6,16 @@ import {
   customerAccountCallbackUrl,
   fetchOpenIdConfiguration,
 } from "@/lib/customer-account-oauth";
+import { isValidShopifyCartGid } from "@/lib/cart-input-validation";
+import { fetchAccountDashboardData } from "@/lib/customer-account-data";
+import { createLogger, redactToken, truncateGid } from "@/lib/logger";
+import {
+  BB_CART_COOKIE,
+  bbCartCookieOptions,
+  storefrontCartBuyerIdentityUpdate,
+} from "@/lib/shopify-cart";
+
+const log = createLogger("api.oauth.callback");
 
 function redirectToAccount(request: NextRequest, query: string) {
   const base = customerAccountAppBaseUrl() ?? new URL(request.url).origin;
@@ -17,6 +27,7 @@ export async function GET(request: NextRequest) {
   const oauthError = params.get("error");
   if (oauthError != null) {
     const desc = params.get("error_description") ?? oauthError;
+    log.warn("oauth_provider_error", { error: oauthError.slice(0, 120) });
     const r = redirectToAccount(
       request,
       `?auth_error=${encodeURIComponent(desc.slice(0, 500))}`,
@@ -28,6 +39,7 @@ export async function GET(request: NextRequest) {
   const code = params.get("code");
   const state = params.get("state");
   if (code == null || state == null) {
+    log.warn("callback_missing_code_or_state");
     const r = redirectToAccount(request, "?auth_error=missing_code");
     r.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
     return r;
@@ -36,6 +48,7 @@ export async function GET(request: NextRequest) {
   const pkceRaw = request.cookies.get(CUSTOMER_ACCOUNT_PKCE_COOKIE)?.value;
 
   if (pkceRaw == null) {
+    log.warn("callback_pkce_cookie_missing");
     const r = redirectToAccount(request, "?auth_error=session_expired");
     r.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
     return r;
@@ -45,12 +58,14 @@ export async function GET(request: NextRequest) {
   try {
     pkce = JSON.parse(pkceRaw) as { state: string; verifier: string };
   } catch {
+    log.warn("callback_pkce_parse_failed");
     const bad = redirectToAccount(request, "?auth_error=invalid_session");
     bad.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
     return bad;
   }
 
   if (pkce.state !== state) {
+    log.warn("callback_state_mismatch");
     const bad = redirectToAccount(request, "?auth_error=state_mismatch");
     bad.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
     return bad;
@@ -67,6 +82,7 @@ export async function GET(request: NextRequest) {
     clientId === "" ||
     redirectUri == null
   ) {
+    log.error("callback_oauth_config_incomplete");
     const bad = redirectToAccount(request, "?auth_error=config");
     bad.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
     return bad;
@@ -92,6 +108,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!tokenRes.ok) {
+    log.warn("token_exchange_http_status", { status: tokenRes.status });
     const bad = redirectToAccount(
       request,
       "?auth_error=token_exchange_failed",
@@ -106,6 +123,7 @@ export async function GET(request: NextRequest) {
   };
 
   if (tokenData.access_token == null || tokenData.access_token === "") {
+    log.warn("token_response_missing_access_token");
     const bad = redirectToAccount(request, "?auth_error=no_access_token");
     bad.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
     return bad;
@@ -116,6 +134,11 @@ export async function GET(request: NextRequest) {
       ? tokenData.expires_in
       : 60 * 60 * 24;
 
+  log.info("oauth_login_success", {
+    token: redactToken(tokenData.access_token),
+    maxAge,
+  });
+
   const ok = redirectToAccount(request, "");
   ok.cookies.delete(CUSTOMER_ACCOUNT_PKCE_COOKIE);
   ok.cookies.set(CUSTOMER_ACCOUNT_TOKEN_COOKIE, tokenData.access_token, {
@@ -125,6 +148,33 @@ export async function GET(request: NextRequest) {
     path: "/",
     maxAge,
   });
+
+  const cartId = request.cookies.get(BB_CART_COOKIE)?.value;
+  if (cartId != null && cartId !== "" && isValidShopifyCartGid(cartId)) {
+    try {
+      const profile = await fetchAccountDashboardData(tokenData.access_token);
+      const email = profile?.email;
+      if (email != null && email !== "") {
+        const { cart, errors } = await storefrontCartBuyerIdentityUpdate(cartId, {
+          email,
+        });
+        if (errors.length === 0 && cart != null) {
+          ok.cookies.set(BB_CART_COOKIE, cart.id, bbCartCookieOptions());
+          log.info("cart_buyer_identity_updated", {
+            cartId: truncateGid(cart.id),
+          });
+        } else {
+          log.warn("cart_buyer_identity_failed", {
+            detail: errors[0] ?? "null_cart",
+          });
+        }
+      }
+    } catch (e) {
+      log.warn("cart_merge_exception", {
+        err: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
 
   return ok;
 }

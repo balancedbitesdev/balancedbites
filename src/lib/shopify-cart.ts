@@ -2,6 +2,18 @@ import { shopifyFetch } from "@/lib/shopify";
 
 export const BB_CART_COOKIE = "bb_cart_id";
 
+export const BB_CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
+
+export function bbCartCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: BB_CART_COOKIE_MAX_AGE,
+  };
+}
+
 const CART_FRAGMENT = `
   fragment CartPayload on Cart {
     id
@@ -110,6 +122,21 @@ const LINES_REMOVE = `
   ${CART_FRAGMENT}
   mutation cartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
     cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+      cart {
+        ...CartPayload
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const BUYER_IDENTITY_UPDATE = `
+  ${CART_FRAGMENT}
+  mutation cartBuyerIdentityUpdate($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+    cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
       cart {
         ...CartPayload
       }
@@ -263,5 +290,30 @@ export async function storefrontCartLinesRemove(
   return {
     cart: body.data?.cartLinesRemove?.cart ?? null,
     errors: [...gqlErrs, ...userErrs],
+  };
+}
+
+/** Associates the Storefront cart with the logged-in customer (email) so items persist through OAuth. */
+export async function storefrontCartBuyerIdentityUpdate(
+  cartId: string,
+  buyerIdentity: { email: string },
+): Promise<{ cart: CartPayload | null; errors: string[] }> {
+  const res = await shopifyFetch({
+    query: BUYER_IDENTITY_UPDATE,
+    variables: { cartId, buyerIdentity },
+  });
+  if (!("body" in res) || res.body == null) {
+    return { cart: null, errors: ["Network error"] };
+  }
+  const body = res.body as {
+    data?: { cartBuyerIdentityUpdate?: { cart?: CartPayload | null } };
+    errors?: { message: string }[];
+  };
+  const gqlErrs = body.errors?.map((e) => e.message) ?? [];
+  const userErrs = readUserErrors(body);
+  const errors = [...gqlErrs, ...userErrs];
+  return {
+    cart: body.data?.cartBuyerIdentityUpdate?.cart ?? null,
+    errors,
   };
 }

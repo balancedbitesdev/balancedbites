@@ -215,7 +215,7 @@ export default async function MenuPage() {
       <main>
         <section
           id="plans"
-          className="mx-auto max-w-6xl px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-16"
+          className="mx-auto max-w-6xl px-4 pb-12 pt-7 sm:px-6 sm:pb-16 sm:pt-10"
           aria-labelledby="menu-heading"
         >
           <p className="inline-flex rounded-full bg-[#b1c995]/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#426237]">

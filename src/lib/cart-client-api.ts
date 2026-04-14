@@ -1,4 +1,10 @@
+import { friendlyCartError } from "@/lib/friendly-cart-errors";
 import type { CartPayload } from "@/lib/shopify-cart";
+
+const CART_FETCH_INIT: RequestInit = {
+  credentials: "same-origin",
+  cache: "no-store",
+};
 
 const CART_UPDATED_EVENT = "bb-cart-updated";
 
@@ -26,7 +32,7 @@ export function subscribeCartUpdated(handler: (detail: CartUpdatedDetail) => voi
 }
 
 export async function fetchCartPayload(): Promise<CartPayload | null> {
-  const res = await fetch("/api/cart", { method: "GET" });
+  const res = await fetch("/api/cart", { ...CART_FETCH_INIT, method: "GET" });
   const data = (await res.json()) as { cart?: CartPayload | null };
   return data.cart ?? null;
 }
@@ -35,11 +41,14 @@ export async function postCartMutation(
   body: object,
 ): Promise<{ ok: true; cart: CartPayload | null } | { ok: false; error: string }> {
   const res = await fetch("/api/cart", {
+    ...CART_FETCH_INIT,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   const data = (await res.json()) as { cart?: CartPayload | null; error?: string };
-  if (!res.ok) return { ok: false, error: data.error ?? "Request failed" };
+  if (!res.ok) {
+    return { ok: false, error: friendlyCartError(data.error) };
+  }
   return { ok: true, cart: data.cart ?? null };
 }
