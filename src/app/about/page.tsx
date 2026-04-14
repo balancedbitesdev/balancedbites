@@ -14,9 +14,9 @@ export default function AboutPage() {
     <div className="min-h-full bg-[#f4f1eb] font-sans text-[#426237]">
       <SiteHeader active="about" orderNowHref="/menu" />
 
-      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      <main className="mx-auto max-w-4xl px-4 pb-12 pt-3 sm:px-6 sm:pb-16 sm:pt-4">
         <article className="overflow-hidden rounded-[2rem] bg-white shadow-xl ring-1 ring-[#426237]/10">
-          <div className="px-8 pb-10 pt-10 sm:px-12 sm:pb-12 sm:pt-12">
+          <div className="px-8 pb-10 pt-4 sm:px-12 sm:pb-12 sm:pt-6">
             <h1 className="menu-serif text-4xl font-semibold tracking-tight">About Us</h1>
 
             <div className="mt-8 space-y-6 text-pretty text-base leading-relaxed text-gray-700">

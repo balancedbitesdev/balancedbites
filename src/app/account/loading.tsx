@@ -15,8 +15,8 @@ export default function AccountLoading() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-6xl px-4 pb-8 pt-5 sm:px-6 sm:pb-10 sm:pt-6">
-        <div className="border-b border-[#426237]/15 pb-6">
+      <main className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:px-6 sm:pb-10 sm:pt-4">
+        <div className="border-b border-[#426237]/15 pb-4">
           <Skeleton height={12} width={96} borderRadius={6} className="leading-none" />
           <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex-1">

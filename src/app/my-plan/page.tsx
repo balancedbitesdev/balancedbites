@@ -113,7 +113,7 @@ export default async function MyPlanPage() {
 
       <main>
         <section
-          className="mx-auto max-w-3xl px-4 pb-2 pt-10 text-center sm:px-6 sm:pt-14"
+          className="mx-auto max-w-3xl px-4 pb-2 pt-3 text-center sm:px-6 sm:pt-5"
           aria-labelledby="plan-intro"
         >
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#426237]/70">

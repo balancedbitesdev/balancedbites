@@ -63,7 +63,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col">
         {/* ──────────────────── HERO (dedicated band) ──────────────────── */}
         <section
-          className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#fffdf9] via-[#f5f0e8] to-[#ebe4d9] px-3 pb-14 pt-6 sm:px-8 sm:pb-20 sm:pt-12 lg:overflow-visible"
+          className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#fffdf9] via-[#f5f0e8] to-[#ebe4d9] px-3 pb-14 pt-2 sm:px-8 sm:pb-20 sm:pt-4 lg:overflow-visible"
           aria-label="Introduction"
         >
           
@@ -76,7 +76,7 @@ export default function Home() {
             }}
           />
 
-          <div className="relative mx-auto max-w-6xl py-8 sm:py-12 lg:py-16">
+          <div className="relative mx-auto max-w-6xl pt-3 pb-8 sm:pt-4 sm:pb-12 lg:pt-6 lg:pb-16">
             <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)] lg:items-center lg:gap-12">
                   {/* Left — copy; mobile salmon layered top-right (full-width copy, plate absolute) */}
                   <div className="max-w-2xl">
@@ -222,7 +222,7 @@ export default function Home() {
         </section>
 
         {/* ──────────────── WHAT WE BELIEVE ──────────────── */}
-        <section className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#ede9e2] to-[#f4f1eb] px-3 pb-16 pt-6 sm:px-8 sm:pb-28 sm:pt-8">
+        <section className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#ede9e2] to-[#f4f1eb] px-3 pb-16 pt-4 sm:px-8 sm:pb-28 sm:pt-5">
           <div className="mx-auto max-w-5xl">
             <ScrollReveal className="text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]">
@@ -282,7 +282,7 @@ export default function Home() {
 
         {/* ──────────── MARQUEE QUOTE ──────────── */}
         <ScrollReveal variant="fade">
-          <section className="relative overflow-hidden bg-[#426237] py-12 sm:py-16">
+          <section className="relative overflow-hidden bg-[#426237] py-8 sm:py-12">
             <div
               className="pointer-events-none absolute inset-0 opacity-30"
               aria-hidden
@@ -320,7 +320,7 @@ export default function Home() {
         </ScrollReveal>
 
         {/* ──────────── CLEAN KETO ──────────── */}
-        <section className="relative overflow-x-clip overflow-y-visible px-3 py-14 sm:px-8 sm:py-28">
+        <section className="relative overflow-x-clip overflow-y-visible px-3 pb-14 pt-8 sm:px-8 sm:pb-28 sm:pt-12">
           <div className="mx-auto max-w-5xl">
             <div className="grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,1.15fr)] lg:gap-16">
               <ScrollReveal variant="slide-left">

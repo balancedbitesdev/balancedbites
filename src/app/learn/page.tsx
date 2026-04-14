@@ -36,7 +36,7 @@ export default function LearnHubPage() {
     <div className="min-h-full bg-[#f4f1eb] font-sans text-[#426237]">
       <SiteHeader active="learn" orderNowHref="/menu" />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <main className="mx-auto max-w-6xl px-4 pb-12 pt-3 sm:px-6 sm:pb-16 sm:pt-4">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#426237]/70">
           Nutrition hub
         </p>

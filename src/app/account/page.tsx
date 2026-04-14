@@ -39,8 +39,8 @@ export default async function AccountPage({
     <div className="min-h-full bg-[#ebe6dc] font-sans text-[#426237]">
       <SiteHeader active="account" orderNowHref="/menu" />
 
-      <main className="mx-auto max-w-6xl px-4 pb-8 pt-5 sm:px-6 sm:pb-10 sm:pt-6">
-        <header className="border-b border-[#426237]/15 pb-6">
+      <main className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:px-6 sm:pb-10 sm:pt-4">
+        <header className="border-b border-[#426237]/15 pb-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#ac8058]">
             Customer
           </p>

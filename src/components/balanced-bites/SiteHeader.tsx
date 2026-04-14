@@ -27,8 +27,9 @@ export function SiteHeader({ active, orderNowHref, warmCanvas = false }: Props) 
 
   return (
     <>
-      <div className="h-[4rem] shrink-0 sm:h-[3rem] lg:h-[2rem]" aria-hidden />
-      <header className="pointer-events-none fixed left-0 right-0 top-0 z-[1055] flex justify-center px-3 pt-2 sm:px-4 sm:pt-4 lg:z-50">
+      {/* Reserves space for fixed bar: pt + bar height (do not shrink below ~3.875rem or content slides under nav). */}
+      <div className="h-[3.875rem] shrink-0 sm:h-[4rem] lg:h-[4.125rem]" aria-hidden />
+      <header className="pointer-events-none fixed left-0 right-0 top-0 z-[1055] flex justify-center px-3 pt-1.5 sm:px-4 sm:pt-2 lg:pt-2.5 lg:z-50">
         <div
           className={`pointer-events-auto flex h-14 w-full max-w-5xl items-center rounded-full shadow-[0_12px_48px_-12px_rgba(66,98,55,0.28)] backdrop-blur-2xl backdrop-saturate-150 sm:h-[3.375rem] lg:h-auto lg:min-h-0 lg:py-2.5 ${barTint}`}
         >

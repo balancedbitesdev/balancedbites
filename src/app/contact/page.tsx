@@ -17,7 +17,7 @@ export default function ContactPage() {
     <div className="min-h-full bg-[#f4f1eb] font-sans text-[#426237]">
       <SiteHeader active="contact" orderNowHref="/menu" />
 
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <main className="mx-auto max-w-6xl px-4 pb-12 pt-3 sm:px-6 sm:pb-16 sm:pt-4">
         <h1 className="menu-serif text-4xl font-semibold tracking-tight">Contact Us</h1>
         <p className="mt-3 max-w-2xl text-pretty text-sm leading-relaxed text-gray-600">
           Reach us on WhatsApp for the fastest response, or send a message through the form.
