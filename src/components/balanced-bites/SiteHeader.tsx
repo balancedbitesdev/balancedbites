@@ -28,7 +28,7 @@ export function SiteHeader({ active, orderNowHref, warmCanvas = false }: Props) 
   return (
     <>
       {/* Reserves space for fixed bar: pt + bar height + small gap below pill (keep in sync with header pt + bar h). */}
-      <div className="h-[4.125rem] shrink-0 sm:h-[4.25rem] lg:h-[4.375rem]" aria-hidden />
+      <div className="h-[4.625rem] shrink-0 sm:h-[4.75rem] lg:h-[4.875rem]" aria-hidden />
       <header className="pointer-events-none fixed left-0 right-0 top-0 z-[1055] flex justify-center px-3 pt-1.5 sm:px-4 sm:pt-2 lg:pt-2.5 lg:z-50">
         <div
           className={`pointer-events-auto flex h-14 w-full max-w-5xl items-center rounded-full shadow-[0_12px_48px_-12px_rgba(66,98,55,0.28)] backdrop-blur-2xl backdrop-saturate-150 sm:h-[3.375rem] lg:h-auto lg:min-h-0 lg:py-2.5 ${barTint}`}
