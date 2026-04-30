@@ -21,6 +21,7 @@ import {
 import { getDeliveryFeeEgp } from "@/lib/delivery-fee";
 import type { CartPayload } from "@/lib/shopify-cart";
 import { useToast } from "@/components/balanced-bites/Toast";
+import { useLocale } from "./LocaleContext";
 import { useMobileMenu } from "./MobileMenuContext";
 
 type CartDrawerContextValue = {
@@ -82,6 +83,7 @@ export function CartDrawer() {
   const { open, setOpen } = useCartDrawer();
   const { open: mobileMenuOpen } = useMobileMenu();
   const { showSoft } = useToast();
+  const { dict: t } = useLocale();
   const router = useRouter();
   const [cart, setCart] = useState<CartPayload | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -126,10 +128,10 @@ export function CartDrawer() {
     if (currency !== "EGP" || deliveryEgp <= 0) {
       return {
         kind: "simple" as const,
-        label: "Estimated total",
+        label: t.common.estimatedTotal,
         amount: subtotal.amount,
         currencyCode: currency,
-        note: "Delivery & taxes are finalized at checkout.",
+        note: "",
       };
     }
     const items = Number.parseFloat(subtotal.amount);
@@ -142,7 +144,7 @@ export function CartDrawer() {
       estimated,
       currencyCode: currency,
     };
-  }, [subtotal]);
+  }, [subtotal, t.common.estimatedTotal]);
 
   async function post(body: object): Promise<boolean> {
     const result = await postCartMutation(body);
@@ -184,14 +186,14 @@ export function CartDrawer() {
 
   return (
     <div
-      className={`fixed inset-0 z-[1070] transition-[visibility] duration-[260ms] ${
-        open ? "visible" : "pointer-events-none invisible delay-[260ms]"
+      className={`fixed inset-0 z-[1070] transition-[visibility] duration-[240ms] motion-reduce:transition-none ${
+        open ? "visible" : "pointer-events-none invisible delay-[240ms]"
       }`}
       aria-hidden={!open}
     >
       <button
         type="button"
-        className={`absolute inset-0 bg-[#1a1a1a]/45 backdrop-blur-[2px] transition-opacity duration-[260ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${
+        className={`absolute inset-0 bg-[#1a1a1a]/45 backdrop-blur-[2px] transition-opacity duration-[240ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
           open ? "opacity-100" : "opacity-0"
         }`}
         onClick={() => setOpen(false)}
@@ -204,12 +206,13 @@ export function CartDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Shopping cart"
-        className={`bb-cart-drawer-panel absolute right-0 top-0 flex h-full w-full max-w-[min(75vw,28rem)] flex-col bg-[#f4f1eb] shadow-2xl ring-1 ring-[#426237]/15 transition-transform duration-[260ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        inert={!open ? true : undefined}
+        className={`bb-cart-drawer-panel absolute right-0 top-0 flex h-full w-full max-w-[min(75vw,28rem)] flex-col bg-[#f4f1eb] shadow-2xl ring-1 ring-[#426237]/15 transition-transform duration-[240ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between border-b border-[#426237]/10 px-5 py-4">
-          <h2 className="menu-serif text-lg font-semibold text-[#426237]">Your cart</h2>
+          <h2 className="menu-serif text-lg font-semibold text-[#426237]">{t.cart.title}</h2>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -229,16 +232,16 @@ export function CartDrawer() {
             </ul>
           ) : cart == null || lines.length === 0 ? (
             <div className="rounded-2xl bg-white/90 px-5 py-10 text-center ring-1 ring-[#426237]/10">
-              <p className="font-semibold text-[#426237]">Your cart is empty</p>
+              <p className="font-semibold text-[#426237]">{t.cart.emptyTitle}</p>
               <p className="mt-2 text-sm text-gray-600">
-                Add meals from the menu—close this panel anytime to keep browsing.
+                {t.cart.emptyBody}
               </p>
               <Link
                 href="/menu"
                 onClick={() => setOpen(false)}
                 className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#426237] px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.55)] transition-[background-color,box-shadow,transform] duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.97]"
               >
-                Browse menu
+                {t.common.browseMenu}
               </Link>
             </div>
           ) : (
@@ -250,24 +253,57 @@ export function CartDrawer() {
                 const lineTotal = line.cost?.totalAmount;
                 const cur = lineTotal?.currencyCode ?? m?.price?.currencyCode ?? "USD";
                 const isBusy = busy === line.id;
+                const visibleAttributes =
+                  line.attributes?.filter(
+                    (a) =>
+                      a.value.trim().length > 0 && !a.key.startsWith("_"),
+                  ) ?? [];
 
                 return (
                   <li
                     key={line.id}
-                    className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-[#426237]/10"
+                    className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] gap-x-3 gap-y-2 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-[#426237]/10 sm:grid-cols-[4rem_minmax(0,1fr)_auto]"
                   >
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-[#f4f1eb]">
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-[#f4f1eb] sm:h-16 sm:w-16">
                       {img ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={img} alt={m?.image?.altText ?? title} className="h-full w-full object-cover" />
                       ) : null}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-[#426237]">{title}</p>
+                    <div className="min-w-0">
+                      <p className="whitespace-normal text-sm font-semibold leading-snug text-[#426237] [overflow-wrap:normal]">
+                        {title}
+                      </p>
                       {m?.title != null && m.title !== "Default Title" ? (
-                        <p className="text-xs text-gray-500">{m.title}</p>
+                        <p className="mt-0.5 whitespace-normal text-xs leading-snug text-gray-500 [overflow-wrap:normal]">
+                          {m.title}
+                        </p>
                       ) : null}
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-gray-400">
+                        {t.common.total}
+                      </p>
+                      <p className="whitespace-nowrap text-xs font-bold tabular-nums text-[#426237] sm:text-sm">
+                        {lineTotal != null ? formatMoney(lineTotal.amount, cur) : "—"}
+                      </p>
+                    </div>
+                    {visibleAttributes.length > 0 ? (
+                      <div className="col-span-3 grid gap-1.5 border-t border-[#426237]/8 pt-2 sm:col-span-2 sm:col-start-2">
+                        {visibleAttributes.map((attr) => (
+                          <p
+                            key={attr.key}
+                            className="max-w-full rounded-md bg-[#f4f1eb] px-2 py-1 text-[11px] leading-snug text-[#6b5b4d] [overflow-wrap:anywhere]"
+                          >
+                            <span className="font-semibold text-[#426237]">
+                              {attr.key}:{" "}
+                            </span>
+                            {attr.value}
+                          </p>
+                        ))}
+                      </div>
+                    ) : null}
+                    <div className="col-span-3 flex flex-wrap items-center gap-2 pt-1 sm:col-span-2 sm:col-start-2">
                         <div className="flex items-center gap-1.5 rounded-full bg-[#f4f1eb] p-0.5 ring-1 ring-[#426237]/12">
                           <button
                             type="button"
@@ -300,15 +336,8 @@ export function CartDrawer() {
                           onClick={() => void removeLine(line.id)}
                           className="text-xs font-semibold text-[#6b5b4d] underline-offset-2 transition-[color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-[#426237] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/25 focus-visible:ring-offset-1 focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.97]"
                         >
-                          Remove
+                          {t.common.remove}
                         </button>
-                      </div>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <p className="text-xs text-gray-500">Total</p>
-                      <p className="text-sm font-bold tabular-nums text-[#426237]">
-                        {lineTotal != null ? formatMoney(lineTotal.amount, cur) : "—"}
-                      </p>
                     </div>
                   </li>
                 );
@@ -322,19 +351,19 @@ export function CartDrawer() {
             {pricing?.kind === "egp" ? (
               <div className="space-y-2 text-[#426237]">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Items</span>
+                  <span className="text-gray-600">{t.common.items}</span>
                   <span className="tabular-nums font-medium">
                     {formatMoney(String(pricing.items), pricing.currencyCode)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Delivery</span>
+                  <span className="text-gray-600">{t.common.delivery}</span>
                   <span className="tabular-nums font-medium">
                     {formatMoney(String(pricing.deliveryEgp), pricing.currencyCode)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between border-t border-[#426237]/10 pt-2">
-                  <span className="text-sm font-semibold">Estimated total</span>
+                  <span className="text-sm font-semibold">{t.common.estimatedTotal}</span>
                   <span className="text-lg font-bold tabular-nums">
                     {formatMoney(String(pricing.estimated), pricing.currencyCode)}
                   </span>
@@ -347,7 +376,7 @@ export function CartDrawer() {
             ) : (
               <div className="flex items-center justify-between text-[#426237]">
                 <span className="text-sm font-semibold">
-                  {pricing?.label ?? "Estimated total"}
+                  {pricing?.label ?? t.common.estimatedTotal}
                 </span>
                 <span className="text-lg font-bold tabular-nums">
                   {subtotal != null
@@ -358,7 +387,7 @@ export function CartDrawer() {
                 </span>
               </div>
             )}
-            {pricing?.kind === "simple" && pricing.note != null ? (
+            {pricing?.kind === "simple" && pricing.note != null && pricing.note !== "" ? (
               <p className="mt-2 text-[11px] leading-snug text-gray-500">{pricing.note}</p>
             ) : null}
             {cart.checkoutUrl ? (
@@ -366,11 +395,11 @@ export function CartDrawer() {
                 href={cart.checkoutUrl}
                 className="mt-4 flex min-h-12 w-full items-center justify-center rounded-full bg-[#426237] px-6 text-center text-sm font-semibold text-white shadow-[0_14px_36px_-20px_rgba(66,98,55,0.65)] transition-[background-color,box-shadow,transform] duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#2c4224] hover:shadow-[0_18px_40px_-18px_rgba(66,98,55,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f1eb] active:scale-[0.97]"
               >
-                Proceed to secure checkout
+                {t.cart.checkout}
               </a>
             ) : (
               <p className="mt-4 text-center text-sm text-stone-600">
-                Checkout will be ready in a moment—feel free to keep browsing.
+                {t.cart.checkout}...
               </p>
             )}
           </div>

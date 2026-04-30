@@ -1,4 +1,5 @@
 import { createLogger } from "@/lib/logger";
+import type { Locale } from "@/lib/i18n";
 
 const log = createLogger("shopify.fetch");
 
@@ -8,9 +9,12 @@ const storefrontAccessToken = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
 export async function shopifyFetch({
   query,
   variables = {},
+  locale,
 }: {
   query: string;
   variables?: Record<string, unknown>;
+  /** Hint for localized catalog responses (used with `@inContext` on the query). */
+  locale?: Locale;
 }) {
   const endpoint = `https://${domain}/api/2024-01/graphql.json`;
 
@@ -20,6 +24,9 @@ export async function shopifyFetch({
       headers: {
         "Content-Type": "application/json",
         "X-Shopify-Storefront-Access-Token": storefrontAccessToken!,
+        ...(locale === "ar"
+          ? { "Accept-Language": "ar,en;q=0.8" }
+          : { "Accept-Language": "en" }),
       },
       body: JSON.stringify({ query, variables }),
     });

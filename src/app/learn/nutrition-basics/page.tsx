@@ -2,26 +2,31 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/balanced-bites/SiteFooter";
 import { SiteHeader } from "@/components/balanced-bites/SiteHeader";
+import { getRequestLocale } from "@/lib/i18n-server";
 
 export const metadata: Metadata = {
   title: "Nutrition basics",
   description: "Nutrition basics from Balanced Bites.",
 };
 
-export default function NutritionBasicsPage() {
+export default async function NutritionBasicsPage() {
+  const locale = await getRequestLocale();
+
   return (
     <div className="min-h-full bg-[#f4f1eb] font-sans text-[#426237]">
-      <SiteHeader active="learn" orderNowHref="/menu" />
+      <SiteHeader active={null} orderNowHref="/menu" />
       <main className="mx-auto max-w-3xl px-4 pb-12 pt-3 sm:px-6">
         <Link href="/learn" className="text-sm font-semibold text-[#ac8058] hover:underline">
-          ← Back to Learn
+          {locale === "ar" ? "← رجوع للتعلم" : "← Back to Learn"}
         </Link>
         <article className="mt-4 rounded-[2rem] bg-white p-8 shadow-xl ring-1 ring-[#426237]/10 sm:p-10">
-          <h1 className="menu-serif text-3xl font-semibold">Nutrition basics</h1>
+          <h1 className="menu-serif text-3xl font-semibold">
+            {locale === "ar" ? "أساسيات التغذية" : "Nutrition basics"}
+          </h1>
           <p className="mt-4 text-sm leading-relaxed text-gray-600">
-            This hub article is a placeholder. Replace with your curriculum: energy balance,
-            protein at every meal, fiber and hydration, and how to read labels—aligned with how
-            Balanced Bites builds menus.
+            {locale === "ar"
+              ? "هنا هنضيف محتوى مبسط عن توازن الطاقة، البروتين في كل وجبة، الفايبر، شرب المياه، وقراءة الليبل بطريقة تناسب منيو Balanced Bites."
+              : "This hub article is a placeholder. Replace with your curriculum: energy balance, protein at every meal, fiber and hydration, and how to read labels-aligned with how Balanced Bites builds menus."}
           </p>
         </article>
       </main>

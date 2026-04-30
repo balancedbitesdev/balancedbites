@@ -29,6 +29,17 @@ const nextConfig: NextConfig = {
         destination: "/menu",
         permanent: false,
       },
+      // Learn hub hidden for now — keep URLs from 404ing for bookmarks & SEO.
+      {
+        source: "/learn",
+        destination: "/",
+        permanent: false,
+      },
+      {
+        source: "/learn/:path*",
+        destination: "/",
+        permanent: false,
+      },
     ];
   },
   images: {

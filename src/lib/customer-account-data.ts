@@ -4,11 +4,19 @@ type CustomerAccountApiDiscovery = {
   graphql_api?: string;
 };
 
+export type AccountOrderLineItem = {
+  variantId: string | null;
+  quantity: number;
+  title: string;
+  variantTitle: string | null;
+};
+
 export type AccountOrderRow = {
   id: string;
   number: string;
   when: string | null;
   totalLabel: string;
+  lineItems: AccountOrderLineItem[];
 };
 
 export type AccountDashboardData = {
@@ -17,8 +25,44 @@ export type AccountDashboardData = {
   orders: AccountOrderRow[];
 };
 
-const DASHBOARD_QUERY = `
+// Preferred query: includes line items with variantId so we can support "Order again".
+const DASHBOARD_WITH_LINES_QUERY = `
   query AccountDashboard {
+    customer {
+      displayName
+      firstName
+      lastName
+      emailAddress {
+        emailAddress
+      }
+      orders(first: 8, reverse: true) {
+        edges {
+          node {
+            id
+            number
+            processedAt
+            totalPrice {
+              amount
+              currencyCode
+            }
+            lineItems(first: 50) {
+              nodes {
+                title
+                quantity
+                variantId
+                variantTitle
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Fallback if the storefront's Customer Account API version predates the line-item fields we want.
+const DASHBOARD_QUERY = `
+  query AccountDashboardNoLines {
     customer {
       displayName
       firstName
@@ -116,6 +160,14 @@ function parseCustomerAndOrders(raw: unknown): AccountDashboardData | null {
               number?: number | string;
               processedAt?: string | null;
               totalPrice?: { amount?: string; currencyCode?: string } | null;
+              lineItems?: {
+                nodes?: Array<{
+                  title?: string | null;
+                  quantity?: number | null;
+                  variantId?: string | null;
+                  variantTitle?: string | null;
+                }>;
+              } | null;
             };
           }>;
         } | null;
@@ -146,11 +198,32 @@ function parseCustomerAndOrders(raw: unknown): AccountDashboardData | null {
       tp?.amount != null && tp.currencyCode != null
         ? formatMoney(tp.amount, tp.currencyCode)
         : "—";
+
+    const rawLines = n?.lineItems?.nodes ?? [];
+    const lineItems: AccountOrderLineItem[] = rawLines
+      .map((li) => ({
+        variantId:
+          li?.variantId != null && li.variantId.length > 0
+            ? String(li.variantId)
+            : null,
+        quantity:
+          typeof li?.quantity === "number" && li.quantity > 0
+            ? Math.floor(li.quantity)
+            : 1,
+        title: String(li?.title ?? "").trim(),
+        variantTitle:
+          li?.variantTitle != null && li.variantTitle.length > 0
+            ? String(li.variantTitle)
+            : null,
+      }))
+      .filter((li) => li.title.length > 0);
+
     return {
       id,
       number,
       when: n?.processedAt ?? null,
       totalLabel,
+      lineItems,
     };
   });
 
@@ -163,9 +236,22 @@ export async function fetchAccountDashboardData(
   const endpoint = await discoverGraphqlEndpoint();
   if (endpoint == null) return null;
 
-  const full = await postCustomerGraphql(endpoint, accessToken, DASHBOARD_QUERY);
+  const full = await postCustomerGraphql(
+    endpoint,
+    accessToken,
+    DASHBOARD_WITH_LINES_QUERY,
+  );
   const parsedFull = full != null ? parseCustomerAndOrders(full) : null;
   if (parsedFull != null) return parsedFull;
+
+  const withoutLines = await postCustomerGraphql(
+    endpoint,
+    accessToken,
+    DASHBOARD_QUERY,
+  );
+  const parsedWithoutLines =
+    withoutLines != null ? parseCustomerAndOrders(withoutLines) : null;
+  if (parsedWithoutLines != null) return parsedWithoutLines;
 
   const minimal = await postCustomerGraphql(endpoint, accessToken, MINIMAL_QUERY);
   const parsedMinimal = minimal != null ? parseCustomerAndOrders(minimal) : null;

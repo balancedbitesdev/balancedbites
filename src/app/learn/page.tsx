@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/balanced-bites/SiteFooter";
 import { SiteHeader } from "@/components/balanced-bites/SiteHeader";
+import { getDictionary } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n-server";
 
 export const metadata: Metadata = {
   title: "Learn | Balanced Bites",
@@ -31,32 +33,34 @@ const CARDS = [
   },
 ] as const;
 
-export default function LearnHubPage() {
+export default async function LearnHubPage() {
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
+
   return (
     <div className="min-h-full bg-[#f4f1eb] font-sans text-[#426237]">
-      <SiteHeader active="learn" orderNowHref="/menu" />
+      <SiteHeader active={null} orderNowHref="/menu" />
 
       <main className="mx-auto max-w-6xl px-4 pb-12 pt-3 sm:px-6 sm:pb-16 sm:pt-4">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#426237]/70">
-          Nutrition hub
+          {t.learn.eyebrow}
         </p>
-        <h1 className="menu-serif mt-3 text-4xl font-semibold tracking-tight">Learn</h1>
+        <h1 className="menu-serif mt-3 text-4xl font-semibold tracking-tight">{t.learn.title}</h1>
         <p className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-gray-600">
-          Short reads and videos to help your household eat well without overwhelm. New lessons
-          roll out here first.
+          {t.learn.intro}
         </p>
 
         <ul className="mt-12 grid gap-6 sm:grid-cols-2">
-          {CARDS.map((c) => (
+          {CARDS.map((c, i) => (
             <li key={c.href}>
               <Link
                 href={c.href}
                 className="block h-full rounded-[2rem] bg-white p-8 shadow-sm ring-1 ring-[#426237]/10 transition-shadow hover:shadow-md"
               >
-                <h2 className="text-xl font-semibold text-[#426237]">{c.title}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">{c.desc}</p>
+                <h2 className="text-xl font-semibold text-[#426237]">{t.learn.cards[i].title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{t.learn.cards[i].desc}</p>
                 <span className="mt-4 inline-block text-sm font-semibold text-[#ac8058]">
-                  Read more →
+                  {t.common.readMore} →
                 </span>
               </Link>
             </li>

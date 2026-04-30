@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { InlineSpinner } from "@/components/balanced-bites/InlineSpinner";
+import { useLocale } from "@/components/balanced-bites/LocaleContext";
 import { submitContact, type ContactState } from "./actions";
 
 const initial: ContactState = { ok: false, message: "" };
@@ -10,6 +11,7 @@ const fieldClass =
   "mt-2 w-full rounded-xl border border-[#426237]/15 bg-[#f4f1eb] px-4 py-3 text-sm text-[#426237] outline-none transition-[border-color,box-shadow] duration-150 ease-out focus:border-[#426237]/25 focus:outline-none focus:ring-2 focus:ring-[#426237]/30 focus:ring-offset-1 focus:ring-offset-[#f4f1eb]";
 
 export function ContactForm() {
+  const { dict: t } = useLocale();
   const [state, formAction, pending] = useActionState(submitContact, initial);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +32,7 @@ export function ContactForm() {
     <form action={formAction} className="mt-8 space-y-4">
       <div>
         <label htmlFor="name" className="text-sm font-semibold text-[#426237]">
-          Name
+          {t.contact.form.name}
         </label>
         <input
           id="name"
@@ -44,7 +46,7 @@ export function ContactForm() {
       </div>
       <div>
         <label htmlFor="email" className="text-sm font-semibold text-[#426237]">
-          Email
+          {t.contact.form.email}
         </label>
         <input
           id="email"
@@ -59,7 +61,7 @@ export function ContactForm() {
       </div>
       <div>
         <label htmlFor="phone" className="text-sm font-semibold text-[#426237]">
-          Phone (WhatsApp preferred)
+          {t.contact.form.phone}
         </label>
         <input
           id="phone"
@@ -73,7 +75,7 @@ export function ContactForm() {
       </div>
       <div>
         <label htmlFor="message" className="text-sm font-semibold text-[#426237]">
-          Message
+          {t.contact.form.message}
         </label>
         <textarea
           id="message"
@@ -102,10 +104,10 @@ export function ContactForm() {
         {pending ? (
           <>
             <InlineSpinner className="text-white" />
-            <span>Sending…</span>
+            <span>{t.common.sending}</span>
           </>
         ) : (
-          "Send message"
+          t.contact.form.send
         )}
       </button>
     </form>

@@ -112,7 +112,7 @@ function ToastViewport({
       id={regionId}
       role="region"
       aria-label="Notifications"
-      className="pointer-events-none fixed bottom-4 right-4 z-[1080] flex max-w-[min(calc(100vw-2rem),20rem)] flex-col gap-2 sm:bottom-6 sm:right-6"
+      className="pointer-events-none fixed bottom-4 end-4 z-[1090] flex max-w-[min(calc(100vw-2rem),20rem)] flex-col gap-2 pb-[max(0px,env(safe-area-inset-bottom))] sm:bottom-6 sm:end-6"
     >
       {items.map((t) => {
         const soft = t.tone === "soft";
@@ -138,7 +138,7 @@ function ToastViewport({
               <button
                 type="button"
                 onClick={() => onDismiss(t.id)}
-                className={`-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-[color,transform] duration-150 ease-out active:scale-[0.97] ${
+                className={`-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-[color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] ${
                   soft
                     ? "text-stone-400 hover:bg-stone-200/60 hover:text-stone-600"
                     : "text-[#426237]/50 hover:bg-[#426237]/8 hover:text-[#426237]"

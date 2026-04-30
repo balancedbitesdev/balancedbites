@@ -34,6 +34,10 @@ const CART_FRAGMENT = `
         node {
           id
           quantity
+          attributes {
+            key
+            value
+          }
           cost {
             totalAmount {
               amount
@@ -161,9 +165,12 @@ export type CartLineMerch = {
   product?: { title: string; handle: string } | null;
 };
 
+export type CartLineAttribute = { key: string; value: string };
+
 export type CartLineNode = {
   id: string;
   quantity: number;
+  attributes?: CartLineAttribute[] | null;
   cost?: { totalAmount?: { amount: string; currencyCode: string } | null } | null;
   merchandise?: CartLineMerch | null;
 };
@@ -223,9 +230,15 @@ export async function storefrontCreateCart(): Promise<CartPayload | null> {
   return body.data?.cartCreate?.cart ?? null;
 }
 
+export type CartLineAttributeInput = { key: string; value: string };
+
 export async function storefrontCartLinesAdd(
   cartId: string,
-  lines: { merchandiseId: string; quantity: number }[],
+  lines: {
+    merchandiseId: string;
+    quantity: number;
+    attributes?: CartLineAttributeInput[];
+  }[],
 ): Promise<{ cart: CartPayload | null; errors: string[] }> {
   const res = await shopifyFetch({
     query: LINES_ADD,

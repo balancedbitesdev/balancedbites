@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { getDictionary } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n-server";
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -21,11 +23,14 @@ function TikTokIcon({ className }: { className?: string }) {
   );
 }
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
+
   return (
     <footer
       id="contact"
-      className="border-t border-white/10 bg-[#426237] py-10 text-white"
+      className="relative z-30 border-t border-white/10 bg-[#426237] py-10 text-white"
     >
       <div
         id="footer"
@@ -34,7 +39,7 @@ export function SiteFooter() {
         <div>
           <p className="menu-serif text-lg font-semibold text-white">Balanced Bites</p>
           <p className="mt-1 text-xs text-white/70">
-            © {new Date().getFullYear()} Balanced Bites. All rights reserved.
+            © {new Date().getFullYear()} Balanced Bites. {t.footer.rights}
           </p>
         </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
@@ -42,22 +47,25 @@ export function SiteFooter() {
             className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-white/75"
             aria-label="Footer"
           >
-            <Link href="/about" className="transition-colors duration-200 ease-out hover:text-white">
-              About
+            <Link
+              href="/about"
+              className="transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] [@media(hover:hover)_and_(pointer:fine)]:hover:text-white"
+            >
+              {t.footer.about}
             </Link>
-            <Link href="/contact" className="transition-colors duration-200 ease-out hover:text-white">
-              Contact
-            </Link>
-            <Link href="/learn" className="transition-colors duration-200 ease-out hover:text-white">
-              Learn
+            <Link
+              href="/contact"
+              className="transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] [@media(hover:hover)_and_(pointer:fine)]:hover:text-white"
+            >
+              {t.footer.contact}
             </Link>
           </nav>
-          <div className="flex items-center gap-3" aria-label="Social media">
+          <div className="flex items-center gap-3" aria-label={t.footer.social}>
             <a
               href="https://www.tiktok.com/@_balancedbites__"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white transition-opacity duration-200 hover:opacity-80"
+              className="text-white transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:opacity-80"
               aria-label="Balanced Bites on TikTok"
             >
               <TikTokIcon className="h-6 w-6" />
@@ -66,7 +74,7 @@ export function SiteFooter() {
               href="https://www.instagram.com/_balancedbites__/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white transition-opacity duration-200 hover:opacity-80"
+              className="text-white transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:opacity-80"
               aria-label="Balanced Bites on Instagram"
             >
               <InstagramIcon className="h-6 w-6" />

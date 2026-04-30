@@ -3,16 +3,16 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { getDictionary, type Locale } from "@/lib/i18n";
 import type { SiteNavActive } from "./SiteHeader";
 
 const ITEMS: { href: string; key: SiteNavActive; label: string }[] = [
   { href: "/", key: "home", label: "Home" },
   { href: "/menu", key: "menu", label: "Menu" },
-  { href: "/learn", key: "learn", label: "Learn" },
-  { href: "/about", key: "about", label: "About" },
-  { href: "/contact", key: "contact", label: "Contact" },
   { href: "/my-plan", key: "my-plan", label: "My Plan" },
+  { href: "/about", key: "about", label: "About" },
   { href: "/account", key: "account", label: "Account" },
+  { href: "/contact", key: "contact", label: "Contact" },
 ];
 
 type Pill = { left: number; top: number; width: number; height: number };
@@ -21,9 +21,11 @@ const EMPTY_PILL: Pill = { left: 0, top: 0, width: 0, height: 0 };
 
 type Props = {
   active: SiteNavActive | null;
+  locale: Locale;
 };
 
-export function DesktopNavDeck({ active }: Props) {
+export function DesktopNavDeck({ active, locale }: Props) {
+  const t = getDictionary(locale);
   const navRef = useRef<HTMLElement>(null);
   const linkRefs = useRef<Partial<Record<SiteNavActive, HTMLAnchorElement | null>>>(
     {},
@@ -48,7 +50,7 @@ export function DesktopNavDeck({ active }: Props) {
       width: el.offsetWidth,
       height: el.offsetHeight,
     });
-  }, [active]);
+  }, [active, locale]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -80,7 +82,8 @@ export function DesktopNavDeck({ active }: Props) {
   return (
     <nav
       ref={navRef}
-      className="menu-scrollbar relative hidden min-w-0 flex-1 justify-center gap-0.5 overflow-x-auto overscroll-x-contain py-2 text-[13px] font-medium lg:flex"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      className="menu-scrollbar relative hidden min-w-0 flex-1 justify-center gap-1 overflow-x-auto overscroll-x-contain px-2 py-2.5 text-[14px] font-medium lg:flex xl:gap-1.5 xl:text-[15px]"
       aria-label="Primary"
     >
       <motion.div
@@ -98,6 +101,8 @@ export function DesktopNavDeck({ active }: Props) {
       />
       {ITEMS.map((item) => {
         const isOn = active === item.key;
+        const label =
+          item.key === "my-plan" ? t.nav.myPlan : t.nav[item.key];
         return (
           <Link
             key={item.key}
@@ -106,13 +111,13 @@ export function DesktopNavDeck({ active }: Props) {
             }}
             href={item.href}
             prefetch
-            className={`relative z-10 whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition-[color,transform] duration-200 ease-out active:scale-95 ${
+            className={`relative z-10 whitespace-nowrap rounded-full px-4 py-2 text-[14px] transition-[color,transform,background-color] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] [@media(hover:hover)_and_(pointer:fine)]:hover:bg-white/35 xl:px-[1.125rem] xl:text-[15px] ${
               isOn
                 ? "font-semibold text-[#426237]"
-                : "font-medium text-[#426237]/75 hover:bg-white/35 hover:text-[#426237]"
+                : "font-medium text-[#426237]/75 [@media(hover:hover)_and_(pointer:fine)]:hover:text-[#426237]"
             }`}
           >
-            {item.label}
+            {label}
           </Link>
         );
       })}

@@ -37,7 +37,7 @@ export function ScrollReveal({
   children,
   variant = "fade-up",
   delay = 0,
-  duration = 900,
+  duration = 620,
   className = "",
   as: Tag = "div",
   once = true,

@@ -1,4 +1,11 @@
-export type MenuFilterId = "all" | "meals" | "desserts" | "meal_plans";
+export type MenuFilterId =
+  | "all"
+  | "keto_desserts"
+  | "high_protein"
+  | "clean_carb"
+  | "veggie_sides"
+  | "salads"
+  | "frozen";
 
 export type MenuProductImage = {
   url: string;

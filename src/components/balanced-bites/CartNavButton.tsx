@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCartDrawer } from "@/components/balanced-bites/CartDrawer";
+import { useLocale } from "@/components/balanced-bites/LocaleContext";
 import { useMobileMenu } from "@/components/balanced-bites/MobileMenuContext";
 import { fetchCartPayload, subscribeCartUpdated } from "@/lib/cart-client-api";
 
 export function CartNavButton() {
   const { open, toggle } = useCartDrawer();
+  const { locale } = useLocale();
   const { setOpen: setMobileMenuOpen } = useMobileMenu();
   const [count, setCount] = useState<number | null>(null);
   const [bump, setBump] = useState(false);
@@ -31,7 +33,7 @@ export function CartNavButton() {
       if (detail.added != null) {
         if (bumpTimer.current != null) clearTimeout(bumpTimer.current);
         setBump(true);
-        bumpTimer.current = setTimeout(() => setBump(false), 450);
+        bumpTimer.current = setTimeout(() => setBump(false), 400);
       }
     });
     return () => {
@@ -59,7 +61,11 @@ export function CartNavButton() {
           ? "bg-[#426237] text-white shadow-[0_12px_28px_-14px_rgba(66,98,55,0.55)]"
           : "bg-white/85 text-[#426237] ring-1 ring-[#426237]/12 hover:bg-white"
       }`}
-      aria-label={`Shopping cart, ${count ?? 0} items`}
+      aria-label={
+        locale === "ar"
+          ? `السلة، ${count ?? 0} صنف`
+          : `Shopping cart, ${count ?? 0} items`
+      }
     >
       <span className={bump ? "bb-cart-bump inline-flex" : "inline-flex"}>
         <CartIcon className="h-6 w-6 sm:h-5 sm:w-5" />

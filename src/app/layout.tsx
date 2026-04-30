@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Dancing_Script, Fraunces, Geist } from "next/font/google";
 import { AppProviders } from "@/components/balanced-bites/AppProviders";
+import { getRequestLocale } from "@/lib/i18n-server";
+import { localeDir } from "@/lib/i18n";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,18 +37,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
+
   return (
     <html
-      lang="en"
+      lang={locale === "ar" ? "ar-EG" : "en"}
+      dir={localeDir(locale)}
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${fraunces.variable} ${dancingScript.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
-        <AppProviders>{children}</AppProviders>
+        <AppProviders locale={locale}>{children}</AppProviders>
       </body>
     </html>
   );
