@@ -1,0 +1,147 @@
+Balanced Bites — products export deduplication audit
+Input: products_export_1.csv  |  Output: products_export_deduped.csv
+
+=== DUPLICATE RESOLUTION (dropped → kept) ===
+Kept: basbosa
+  Dropped: protein-basbousa
+Kept: boiled-sweet-potato
+  Dropped: boiled-sweet-potatoes
+Kept: brownies
+  Dropped: protein-brownies
+Kept: chicken-mushroom-stroganoff
+  Dropped: chicken-stroganoff
+Kept: chicken-shish-tawook
+  Dropped: shish-tawook
+Kept: chocolate-cupcake
+  Dropped: protein-chocolate-cupcake
+Kept: coconut-truffles
+  Dropped: protein-coconut-truffle
+Kept: creamy-beetroot-hummus-tahini
+  Dropped: creamy-beetroot-hummus-with-tahini
+Kept: dawood-basha-kofta
+  Dropped: beef-meatballs-dawood-basha
+Kept: doner-kabab
+  Dropped: doner-kebab
+Kept: grilled-sweet-potato-whole
+  Dropped: grilled-sweet-potatoes
+Kept: keto-swedish-meatball
+  Dropped: keto-swedish-meatballs
+Kept: lazy-cake
+  Dropped: protein-lazy-cake
+Kept: mixed-cabbage-salad-beetroot-carrot
+  Dropped: mixed-cabbage-salad-with-beetroot-and-carrot
+Kept: peanut-butter-tart
+  Dropped: protein-peanut-butter-tart
+Kept: protein-chocolate-chip-cookies [forced canonical]
+  Dropped: chocolate-chip-cookies
+Kept: protein-vanilla-cupcake
+  Dropped: vanilla-cupcake
+Kept: stuffed-bell-peppers
+  Dropped: stuffed-bell-peppers-beef-chicken
+
+=== FLAGS: remaining products (missing image or macros) ===
+Macros = nutrition numbers in Body HTML OR any product metafield (carbs/fats/protein/ingredients).
+
+[NO_IMAGE] protein-birthday-cake-chocolate
+    Title: Birthday Cake — Chocolate
+[NO_IMAGE] protein-birthday-cake-almond-vanilla
+    Title: Birthday Cake — Almond Vanilla
+[NO_IMAGE] protein-kahk
+    Title: Kahk
+[NO_IMAGE] protein-chocolate-cookies
+    Title: Chocolate Cookies
+[NO_IMAGE] protein-chocolate-chip-cookies
+    Title: Chocolate Chip Cookies
+[NO_IMAGE] protein-vanilla-cupcake
+    Title: Vanilla Cupcake
+[NO_MACROS_OR_METAFIELDS] mixed-cabbage-salad-beetroot-carrot
+    Title: Mixed Cabbage Salad with Beetroot and Carrot
+[NO_MACROS_OR_METAFIELDS] creamy-beetroot-hummus-tahini
+    Title: Creamy Beetroot Hummus with Tahini
+[NO_MACROS_OR_METAFIELDS] boiled-sweet-potato
+    Title: Boiled Sweet Potato
+[NO_MACROS_OR_METAFIELDS] grilled-sweet-potato-whole
+    Title: Grilled Sweet Potato (Whole)
+[NO_MACROS_OR_METAFIELDS] grilled-sweet-potato-fingers
+    Title: Grilled Sweet Potato Fingers
+[NO_MACROS_OR_METAFIELDS] roasted-potatoes-zucchini-carrots
+    Title: Roasted Potatoes, Zucchini and Carrots
+[NO_MACROS_OR_METAFIELDS] cheesy-baked-chicken-meatballs
+    Title: Cheesy Baked Chicken Meatballs with Caramelized Onion
+[NO_MACROS_OR_METAFIELDS] stuffed-bell-peppers
+    Title: Stuffed Bell Peppers (Beef or Chicken)
+[NO_MACROS_OR_METAFIELDS] keto-swedish-meatball
+    Title: Keto Swedish Meatball
+[NO_MACROS_OR_METAFIELDS] chicken-shish-tawook
+    Title: Chicken Shish Tawook
+[NO_MACROS_OR_METAFIELDS] dawood-basha-kofta
+    Title: Dawood Basha Kofta
+[NO_MACROS_OR_METAFIELDS] doner-kabab
+    Title: Doner Kebab
+[NO_MACROS_OR_METAFIELDS] classic-beef-stroganoff
+    Title: Classic Beef Stroganoff
+[NO_MACROS_OR_METAFIELDS] chicken-mushroom-stroganoff
+    Title: Chicken Mushroom Stroganoff
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] keto-taco-salad
+    Title: Keto Taco Salad
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] creamy-tahini-with-sumac
+    Title: Creamy Tahini with Sumac
+[NO_MACROS_OR_METAFIELDS] grilled-chicken-caesar-salad
+    Title: Grilled Chicken Caesar Salad
+[NO_MACROS_OR_METAFIELDS] rocca-salad
+    Title: Ruccola (Rocca) Salad
+[NO_MACROS_OR_METAFIELDS] baked-potatoes
+    Title: Baked Potatoes
+[NO_MACROS_OR_METAFIELDS] seasonal-sauteed-vegetables
+    Title: Seasonal Sautéed Vegetables
+[NO_MACROS_OR_METAFIELDS] steamed-egyptian-white-rice
+    Title: Steamed Egyptian White Rice
+[NO_MACROS_OR_METAFIELDS] basmati-rice
+    Title: Basmati Rice
+[NO_MACROS_OR_METAFIELDS] beef-shawarma
+    Title: Beef Shawarma
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] keto-beef-teriyaki
+    Title: Keto Beef Teriyaki
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] keto-beef-stroganoff
+    Title: Keto Beef Stroganoff
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] keto-chicken-teriyaki
+    Title: Keto Chicken Teriyaki
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] chicken-kofta-with-caramelized-onions
+    Title: Chicken Kofta with Caramelized Onions
+[NO_MACROS_OR_METAFIELDS] butter-chicken
+    Title: Butter Chicken
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] chicken-shawarma
+    Title: Chicken Shawarma
+[NO_MACROS_OR_METAFIELDS] chicken-fajita
+    Title: Chicken Fajita
+[NO_MACROS_OR_METAFIELDS] keto-chicken-sweet-and-sour
+    Title: Keto Chicken Sweet and Sour
+[NO_MACROS_OR_METAFIELDS] basbosa
+    Title: Basbosa
+[NO_MACROS_OR_METAFIELDS] coconut-truffles
+    Title: Coconut Truffles
+[NO_MACROS_OR_METAFIELDS] chocolate-truffles
+    Title: Chocolate Truffles
+[NO_MACROS_OR_METAFIELDS] cereal
+    Title: Cereal
+[NO_MACROS_OR_METAFIELDS] brownies
+    Title: Brownies
+[NO_IMAGE, NO_MACROS_OR_METAFIELDS] plain-cookies
+    Title: Plain Cookies
+[NO_MACROS_OR_METAFIELDS] lazy-cake
+    Title: Lazy Cake
+[NO_MACROS_OR_METAFIELDS] chocolate-cupcake
+    Title: Chocolate Cupcake
+[NO_MACROS_OR_METAFIELDS] peanut-butter-tart
+    Title: Peanut Butter Tart
+[OK] protein-jar
+
+=== OWNER / COMMENT REFERENCES (for manual QA) ===
+WhatsApp (images + dish names): Chicken Mushroom Stroganoff, Classic Beef Stroganoff, Butter Chicken, Beef Shawarma, Doner Kebab, Dawood Basha Kofta, Chicken Fajita, Chicken Shish Tawook, Keto Chicken Sweet and Sour, Keto Swedish Meatball, Stuffed bell peppers, Baked potatoes, Roasted potatoes zucchini and carrots, Seasonal sautéed vegetables (+ PNG sides/salads Basmati, Boiled Sweet Potato, etc.).
+website comments.pptx slide 13 — Meals/sides/salads menu lines + items 17–18 (chicken calzone, classic grilled chicken/meat …).
+website comments.pptx slides 10–12 — Protein Jar flavors + dessert ingredients/macros.
+
+=== ITEMS IN WEBSITE COMMENTS (PPTX) NOT IN DUPLICATE SETS ===
+Slide 13 lists: Keto Taco Salad, Creamy Tahini With Sumac, Keto Chicken/Beef Teriyaki, Chicken Kofta With Caramelized Onions, Chicken Shawarma, etc. Some exist only as legacy 'Meal' placeholders without WhatsApp photos — review manually.
+
+website comments.pptx also details Protein Jar flavors with ingredients (slide 10–12).
