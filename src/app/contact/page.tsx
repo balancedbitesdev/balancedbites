@@ -16,8 +16,8 @@ const WHATSAPP_LINK = `https://wa.me/${WHATSAPP.replace(/\D/g, "")}`;
 
 // TODO(owner): update these with the exact pickup coords.
 // Override via .env: NEXT_PUBLIC_PICKUP_LAT / LNG / LABEL.
-const PICKUP_LAT = process.env.NEXT_PUBLIC_PICKUP_LAT ?? "29.9792";
-const PICKUP_LNG = process.env.NEXT_PUBLIC_PICKUP_LNG ?? "30.9445";
+const PICKUP_LAT = process.env.NEXT_PUBLIC_PICKUP_LAT ?? "30.015164";
+const PICKUP_LNG = process.env.NEXT_PUBLIC_PICKUP_LNG ?? "31.002628";
 const PICKUP_LABEL =
   process.env.NEXT_PUBLIC_PICKUP_LABEL ?? "Our kitchen in 6th of October";
 

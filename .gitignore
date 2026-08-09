@@ -44,4 +44,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# raw media & scratch assets
 /WhatsApp/
+/all_product_images/
+/BB website material/
+/WhatsApp Chat with Balanced Bites website/
+/Products Photos/
+/__pycache__/
+/*.csv
+/*.py
+/*.txt
+/*.pdf
+

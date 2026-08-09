@@ -193,26 +193,50 @@ export default async function Home() {
 
                       <div className="rounded-[1.25rem] bg-white/80 p-1.5 shadow-[0_18px_45px_-30px_rgba(66,98,55,0.28)] ring-1 ring-[#426237]/10 sm:rounded-[1.75rem]">
                         <div className="rounded-[calc(1.25rem-0.375rem)] bg-white px-4 py-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.65)] sm:rounded-[calc(1.75rem-0.375rem)] sm:px-5 sm:py-5">
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]">
-                            {locale === "ar" ? "الفوايد" : "Benefits"}
+                          <p
+                            className={
+                              locale === "ar"
+                                ? "text-xs font-bold tracking-normal text-[#9b704b]"
+                                : "text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]"
+                            }
+                          >
+                            {locale === "ar" ? "ليه تختار الأكل الصحي؟" : "Why Choose Healthy Eating?"}
                           </p>
-                          <div className="mt-4 space-y-3 text-sm text-[#426237]/78">
-                            <p>{locale === "ar" ? "مناعة أقوى" : "Stronger immunity"}</p>
-                            <p>{locale === "ar" ? "طاقة أحسن طول اليوم" : "Better day-long energy"}</p>
-                            <p>{locale === "ar" ? "وزن صحي لكل الأعمار" : "Healthy weight for all ages"}</p>
-                          </div>
+                          <p
+                            className={
+                              locale === "ar"
+                                ? "mt-4 text-[15px] font-medium leading-7 text-[#426237]/90"
+                                : "mt-4 text-sm leading-relaxed text-[#426237]/78"
+                            }
+                          >
+                            {locale === "ar"
+                              ? "استمتع بطاقة مستمرة، سكر دم متوازن، وزن صحي، ومناعة أقوى، بوجبات مغذية وبمكونات حقيقية ونظيفة."
+                              : "Enjoy steady energy, balanced blood sugar, a healthy weight, and a stronger immune system, all by nourishing your body with real, natural food."}
+                          </p>
                         </div>
                       </div>
 
                       <div className="rounded-[1.25rem] bg-[#efe8dc] p-1.5 shadow-[0_18px_45px_-30px_rgba(66,98,55,0.28)] ring-1 ring-[#426237]/10 sm:rounded-[1.75rem]">
                         <div className="rounded-[calc(1.25rem-0.375rem)] bg-[linear-gradient(180deg,#fffaf0_0%,#f3ebde_100%)] px-4 py-4 sm:rounded-[calc(1.75rem-0.375rem)] sm:px-5 sm:py-5">
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#426237]/70">
-                            {locale === "ar" ? "أكل نضيف" : "Clean Eating"}
+                          <p
+                            className={
+                              locale === "ar"
+                                ? "text-xs font-bold tracking-normal text-[#426237]/85"
+                                : "text-[10px] font-semibold uppercase tracking-[0.22em] text-[#426237]/70"
+                            }
+                          >
+                            {locale === "ar" ? "أسلوب حياة كيتو نضيف" : "Clean Keto Lifestyle"}
                           </p>
-                          <p className="mt-4 text-sm leading-6 text-[#426237]/78">
+                          <p
+                            className={
+                              locale === "ar"
+                                ? "mt-4 text-[15px] font-medium leading-7 text-[#426237]/90"
+                                : "mt-4 text-sm leading-relaxed text-[#426237]/78"
+                            }
+                          >
                             {locale === "ar"
-                              ? "مكونات حقيقية، دهون صحية، من غير سكر، من غير دقيق أبيض، ومن غير زيوت مصنعة."
-                              : "Real ingredients, healthy fats, zero sugar, zero white flour, no processed oils."}
+                              ? "من غير سكر أبيض، من غير دقيق أبيض، من غير جلوتين، مكونات حقيقية ونظيفة. كيتو أو مش كيتو هتستمتع بيه."
+                              : "No white sugar, no white flour, no gluten, just clean, real ingredients. Keto or not, you can still enjoy it."}
                           </p>
                         </div>
                       </div>
@@ -300,17 +324,17 @@ export default async function Home() {
                         {locale === "ar" ? "لايف ستايل أكل نضيف" : "Clean Eating Lifestyle"}
                       </p>
                       <h3 className="menu-serif relative mt-4 text-[1.65rem] font-bold leading-tight sm:text-[2rem]">
-                        {locale === "ar" ? "من غير أبيض، من غير جلوتين، ومن غير تنازل عن الطعم." : "No whites, no gluten, no compromise."}
+                        {locale === "ar" ? "من غير أبيض، من غير جلوتين، ومن غير تنازل عن الطعم." : "No white sugar, no refined flour, no gluten and no hydrogenated oils."}
                       </h3>
                       <p className="relative mt-4 text-sm leading-7 text-white/75">
                         {locale === "ar"
                           ? "من غير سكر أبيض، من غير دقيق أبيض، ومن غير جلوتين - بس مكونات نضيفة وحقيقية."
-                          : "No white sugar, no white flour, no gluten - just clean, real ingredients. Simple, honest food you can feel good about."}
+                          : "Just real, clean ingredients you can trust. Simple. Sustainable. Actually delicious."}
                       </p>
                       <div className="relative mt-6 flex flex-wrap gap-2">
                         {(locale === "ar"
                           ? ["من غير سكر أبيض", "من غير دقيق أبيض", "من غير جلوتين"]
-                          : ["No white sugar", "No white flour", "No gluten"]
+                          : ["No white sugar", "No refined flour", "No gluten", "No hydrogenated oils"]
                         ).map((label) => (
                           <span
                             key={label}
@@ -341,13 +365,31 @@ export default async function Home() {
         <section className="relative overflow-x-clip overflow-y-visible bg-gradient-to-b from-[#ede9e2] to-[#f4f1eb] px-3 pb-8 pt-4 sm:px-8 sm:pb-10 sm:pt-5">
           <div className="mx-auto max-w-5xl">
             <ScrollReveal className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]">
+              <p
+                className={
+                  locale === "ar"
+                    ? "text-sm font-bold tracking-normal text-[#9b704b]"
+                    : "text-[10px] font-semibold uppercase tracking-[0.22em] text-[#ac8058]"
+                }
+              >
                 {t.home.whatBelieve}
               </p>
-              <h2 className="menu-serif mx-auto mt-4 max-w-xl text-[1.65rem] font-bold leading-[1.1] tracking-tight text-[#426237] sm:text-[2.65rem]">
+              <h2
+                className={
+                  locale === "ar"
+                    ? "menu-serif mx-auto mt-5 max-w-3xl text-[2.35rem] font-bold leading-[1.2] tracking-normal text-[#426237] sm:text-[3.25rem]"
+                    : "menu-serif mx-auto mt-4 max-w-xl text-[1.65rem] font-bold leading-[1.1] tracking-tight text-[#426237] sm:text-[2.65rem]"
+                }
+              >
                 {t.home.feelHome}
               </h2>
-              <p className="mx-auto mt-5 max-w-lg text-base leading-7 text-[#426237]/60">
+              <p
+                className={
+                  locale === "ar"
+                    ? "mx-auto mt-6 max-w-2xl text-lg font-medium leading-9 text-[#426237]/80"
+                    : "mx-auto mt-5 max-w-lg text-base leading-7 text-[#426237]/60"
+                }
+              >
                 {t.home.feelHomeBody}
               </p>
             </ScrollReveal>
@@ -586,64 +628,68 @@ export default async function Home() {
             <div className="mt-14 grid gap-5 sm:gap-6 lg:grid-cols-3">
               {[
                 {
-                  tier: locale === "ar" ? "برونز" : "Bronze",
-                  duration: locale === "ar" ? "شهر واحد" : "1 Month",
-                  tagline: locale === "ar" ? "جرّب وحس بالفرق." : "Try it, feel the difference.",
+                  tier: locale === "ar" ? "جرّب ودوق" : "Try & Taste",
+                  duration: locale === "ar" ? "شهر واحد · برونز" : "1 month · Bronze",
+                  tagline: locale === "ar" ? "التزام قليل، قيمة عالية." : "Low commitment, high value.",
                   accent: "bronze",
                   features:
                     locale === "ar"
                       ? [
-                          "طبق أسبوعي متظبط على اختيارك",
-                          "وجبة هدية كل أسبوع",
                           "وقف أو عدّي أي أسبوع",
+                          "صمم طبقك الأسبوعي على ذوقك",
+                          "حدد تفضيلاتك الغذائية والحساسية",
+                          "دعم طلبات عبر واتساب",
                         ]
                       : [
-                          "Fully customizable weekly plate",
-                          "Free meal every week",
                           "Pause or skip any week",
+                          "Fully customize your weekly plate",
+                          "Set dietary preferences & allergies",
+                          "WhatsApp order support",
                         ],
                 } as const,
                 {
-                  tier: locale === "ar" ? "سيلفر" : "Silver",
-                  duration: locale === "ar" ? "٣ شهور" : "3 Months",
+                  tier: locale === "ar" ? "ابني عادتك" : "Build Your Habit",
+                  duration: locale === "ar" ? "٣ شهور · سيلفر" : "3 months · Silver",
                   tagline:
-                    locale === "ar" ? "ابني عادات حقيقية تكمل معاك." : "Build real, lasting habits.",
+                    locale === "ar" ? "النتايج الحقيقية بتبدأ هنا." : "Real results start here.",
                   accent: "silver",
                   featured: true,
                   features:
                     locale === "ar"
                       ? [
-                          "كل حاجة في برونز",
-                          "تجديدات موسمية للمنيو",
-                          "أولوية في ميعاد الدليفري",
-                          "متابعة مع أخصائية التغذية",
+                          "كل حاجة في برونز، بالإضافة لـ",
+                          "استشارة أخصائية تغذية بالموبايل شهريًا (١٥ دقيقة)",
+                          "رشّح صديقك — واكسب وجبة مجانية",
+                          "+ ديسيرت هدية متضمن كل أسبوع",
                         ]
                       : [
-                          "Everything in Bronze",
-                          "Seasonal menu refreshes",
-                          "Priority delivery slot",
-                          "Dietitian check-ins",
+                          "Everything in Bronze, plus",
+                          "Monthly dietitian mobile advice (15 min call)",
+                          "Refer a friend — earn a free meal",
+                          "+ Free dessert included every week",
                         ],
                 } as const,
                 {
-                  tier: locale === "ar" ? "جولد" : "Gold",
-                  duration: locale === "ar" ? "٦ شهور" : "6 Months",
+                  tier: locale === "ar" ? "صحتك كاملة" : "All-In Wellness",
+                  duration: locale === "ar" ? "٦ شهور · جولد" : "6 months · Gold",
                   tagline:
-                    locale === "ar" ? "استثمر بجد في صحتك." : "Go all-in on your health.",
+                    locale === "ar" ? "صحتك متظبطة بالكامل." : "Your health, fully taken care of.",
                   accent: "gold",
                   features:
                     locale === "ar"
                       ? [
-                          "كل حاجة في سيلفر",
-                          "أهداف ماكروز مخصوصة ليك",
-                          "تجربة وصفات جديدة قبل نزولها",
-                          "مراجعة تغذية كل ٣ شهور",
+                          "كل حاجة في سيلفر، بالإضافة لـ",
+                          "تواصل مباشر مع كوتش التغذية من ٩ لـ ٥ يوميًا",
+                          "دخول مبكر لوصفات المنيو الجديدة قبل نزولها",
+                          "رد VIP على واتساب خلال ساعة",
+                          "صندوق مفاجأة في عيد ميلادك",
                         ]
                       : [
-                          "Everything in Silver",
-                          "Personalized macro targets",
-                          "Exclusive new-recipe previews",
-                          "Quarterly nutrition reviews",
+                          "Everything in Silver, plus",
+                          "Nutrition coach reach from 9 to 5 daily",
+                          "Early access to new menu items before launch",
+                          "WhatsApp VIP response within 1 hour",
+                          "Birthday surprise box",
                         ],
                 } as const,
               ].map((pkg, i) => {

@@ -50,7 +50,7 @@ export function DesktopNavDeck({ active, locale }: Props) {
       width: el.offsetWidth,
       height: el.offsetHeight,
     });
-  }, [active, locale]);
+  }, [active]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -71,7 +71,7 @@ export function DesktopNavDeck({ active, locale }: Props) {
       window.removeEventListener("resize", updatePill);
       ro?.disconnect();
     };
-  }, [updatePill]);
+  }, [updatePill, locale]);
 
   const showPill = active != null && pill.width > 0;
 

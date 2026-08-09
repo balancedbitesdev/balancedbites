@@ -93,60 +93,62 @@ export default function Stepper({
   };
 
   return (
-    <div className="w-full" {...rest}>
+    <div className="w-full min-w-0 max-w-full" {...rest}>
       <div
-        className={`mx-auto w-full max-w-2xl rounded-[2rem] bg-white shadow-xl ring-1 ring-[#426237]/10 ${stepCircleContainerClassName}`}
+        className={`mx-auto w-full min-w-0 max-w-2xl overflow-x-clip rounded-[2rem] bg-white shadow-xl ring-1 ring-[#426237]/10 ${stepCircleContainerClassName}`}
       >
-        <div
-          className={`${stepContainerClassName} flex w-full items-center px-6 pt-6 sm:px-10 sm:pt-8`}
-        >
-          {stepsArray.map((_, index) => {
-            const stepNumber = index + 1;
-            const isNotLastStep = index < totalSteps - 1;
-            return (
-              <React.Fragment key={stepNumber}>
-                {renderStepIndicator ? (
-                  renderStepIndicator({
-                    step: stepNumber,
-                    currentStep,
-                    onStepClick: (clicked) => {
-                      setDirection(clicked > currentStep ? 1 : -1);
-                      updateStep(clicked);
-                    },
-                  })
-                ) : (
-                  <StepIndicator
-                    step={stepNumber}
-                    disableStepIndicators={disableStepIndicators}
-                    currentStep={currentStep}
-                    onClickStep={(clicked) => {
-                      setDirection(clicked > currentStep ? 1 : -1);
-                      updateStep(clicked);
-                    }}
-                  />
-                )}
-                {isNotLastStep && (
-                  <StepConnector isComplete={currentStep > stepNumber} />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
+        {!isCompleted && (
+          <div
+            className={`${stepContainerClassName} flex min-w-0 w-full items-center px-4 pt-6 sm:px-10 sm:pt-8`}
+          >
+            {stepsArray.map((_, index) => {
+              const stepNumber = index + 1;
+              const isNotLastStep = index < totalSteps - 1;
+              return (
+                <React.Fragment key={stepNumber}>
+                  {renderStepIndicator ? (
+                    renderStepIndicator({
+                      step: stepNumber,
+                      currentStep,
+                      onStepClick: (clicked) => {
+                        setDirection(clicked > currentStep ? 1 : -1);
+                        updateStep(clicked);
+                      },
+                    })
+                  ) : (
+                    <StepIndicator
+                      step={stepNumber}
+                      disableStepIndicators={disableStepIndicators}
+                      currentStep={currentStep}
+                      onClickStep={(clicked) => {
+                        setDirection(clicked > currentStep ? 1 : -1);
+                        updateStep(clicked);
+                      }}
+                    />
+                  )}
+                  {isNotLastStep && (
+                    <StepConnector isComplete={currentStep > stepNumber} />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+        )}
 
         <StepContentWrapper
           isCompleted={isCompleted}
           currentStep={currentStep}
           direction={direction}
-          className={`px-6 pt-6 sm:px-10 sm:pt-8 ${contentClassName}`}
+          className={`${contentClassName} min-w-0 max-w-full w-full overflow-x-clip`}
         >
           {stepsArray[currentStep - 1]}
         </StepContentWrapper>
 
         {!isCompleted && (
-          <div className={`px-6 pb-6 sm:px-10 sm:pb-8 ${footerClassName}`}>
+          <div className={`min-w-0 px-4 pb-6 sm:px-10 sm:pb-8 ${footerClassName}`}>
             <div
               dir={footerDir}
-              className={`mt-8 flex ${
+              className={`mt-8 flex min-w-0 w-full flex-wrap gap-3 ${
                 currentStep !== 1 ? "justify-between" : "justify-end"
               }`}
             >
@@ -197,7 +199,7 @@ function StepContentWrapper({
 
   return (
     <motion.div
-      style={{ position: "relative", overflow: "hidden" }}
+      style={{ position: "relative", overflow: "hidden", minWidth: 0 }}
       animate={{ height: isCompleted ? 0 : parentHeight }}
       transition={{ type: "spring", duration: 0.4 }}
       className={className}
@@ -245,7 +247,8 @@ function SlideTransition({
       animate="center"
       exit="exit"
       transition={{ duration: 0.4 }}
-      style={{ position: "absolute", left: 0, right: 0, top: 0 }}
+      style={{ position: "absolute", left: 0, right: 0, top: 0, width: "100%", maxWidth: "100%", boxSizing: "border-box" }}
+      className="min-w-0 px-4 pt-6 sm:px-10 sm:pt-8"
     >
       {children}
     </motion.div>
@@ -254,7 +257,7 @@ function SlideTransition({
 
 const stepVariants: Variants = {
   enter: (dir: number) => ({
-    x: dir >= 0 ? "-100%" : "100%",
+    x: dir >= 0 ? "100%" : "-100%",
     opacity: 0,
   }),
   center: {
@@ -262,7 +265,7 @@ const stepVariants: Variants = {
     opacity: 1,
   },
   exit: (dir: number) => ({
-    x: dir >= 0 ? "50%" : "-50%",
+    x: dir >= 0 ? "-100%" : "100%",
     opacity: 0,
   }),
 };
@@ -272,7 +275,7 @@ interface StepProps {
 }
 
 export function Step({ children }: StepProps) {
-  return <div className="pb-2">{children}</div>;
+  return <div className="min-w-0 w-full max-w-full pb-2">{children}</div>;
 }
 
 interface StepIndicatorProps {
@@ -307,7 +310,7 @@ function StepIndicator({
       role="button"
       tabIndex={disableStepIndicators ? -1 : 0}
       aria-label={`Go to step ${step}`}
-      className={`relative outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 focus-visible:rounded-full ${
+      className={`relative shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[#426237]/30 focus-visible:rounded-full ${
         disableStepIndicators
           ? "pointer-events-none opacity-50"
           : "cursor-pointer"
@@ -347,7 +350,7 @@ function StepConnector({ isComplete }: StepConnectorProps) {
   };
 
   return (
-    <div className="relative mx-2 h-0.5 flex-1 overflow-hidden rounded bg-[#426237]/15">
+    <div className="relative mx-1 h-0.5 min-w-0 flex-1 overflow-hidden rounded bg-[#426237]/15 sm:mx-2">
       <motion.div
         className="absolute left-0 top-0 h-full"
         variants={lineVariants}

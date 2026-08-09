@@ -46,17 +46,30 @@ export async function submitPlanInquiry(
   const get = (key: string) => String(formData.get(key) ?? "").trim();
 
   const fullName = get("fullName");
-  const email = get("email");
-  const phone = get("phone");
   const age = get("age");
   const gender = get("gender");
+  const email = get("email");
+  const phone = get("phone");
+
   const weightKg = get("weightKg");
   const heightCm = get("heightCm");
+  const bodyFatPct = get("bodyFatPct");
+
   const activityLevel = get("activityLevel");
+  const workType = get("workType");
+
   const goal = get("goal");
+  const targetWeightKg = get("targetWeightKg");
+
+  const medicalConditions = get("medicalConditions");
   const dietPreference = get("dietPreference");
   const allergies = get("allergies");
-  const preferredTier = get("preferredTier");
+  const dislikedFoods = get("dislikedFoods");
+
+  const mealsPerDay = get("mealsPerDay");
+  const sugarCravings = get("sugarCravings");
+  const lateNightEating = get("lateNightEating");
+
   const notes = get("notes");
 
   if (fullName.length < 2) {
@@ -75,26 +88,39 @@ export async function submitPlanInquiry(
   const { apiKey, to, from, missing } = getResendEnv();
 
   const textSections: string[] = [
-    "CONTACT",
+    "1. PERSONAL INFORMATION",
     `  Full name: ${fullName}`,
+    `  Age: ${age || "(not provided)"}`,
+    `  Gender: ${gender || "(not provided)"}`,
     `  Email: ${email}`,
-    `  Phone: ${phone.length > 0 ? phone : "(not provided)"}`,
+    `  Phone: ${phone || "(not provided)"}`,
     "",
-    "ABOUT THEM",
-    `  Age: ${age.length > 0 ? age : "(not provided)"}`,
-    `  Gender: ${gender.length > 0 ? gender : "(not provided)"}`,
-    `  Weight: ${weightKg.length > 0 ? `${weightKg} kg` : "(not provided)"}`,
-    `  Height: ${heightCm.length > 0 ? `${heightCm} cm` : "(not provided)"}`,
-    `  Activity level: ${activityLevel.length > 0 ? activityLevel : "(not provided)"}`,
+    "2. BODY DETAILS",
+    `  Weight: ${weightKg ? `${weightKg} kg` : "(not provided)"}`,
+    `  Height: ${heightCm ? `${heightCm} cm` : "(not provided)"}`,
+    `  Body Fat %: ${bodyFatPct ? `${bodyFatPct}%` : "(optional)"}`,
     "",
-    "GOALS & PREFERENCES",
-    `  Goal: ${goal.length > 0 ? goal : "(not provided)"}`,
-    `  Diet preference: ${dietPreference.length > 0 ? dietPreference : "(not provided)"}`,
-    `  Allergies / intolerances: ${allergies.length > 0 ? allergies : "(none)"}`,
-    `  Preferred subscription tier: ${preferredTier.length > 0 ? preferredTier : "(not specified)"}`,
+    "3. LIFESTYLE",
+    `  Activity level: ${activityLevel || "(not provided)"}`,
+    `  Work type: ${workType || "(not provided)"}`,
     "",
-    "NOTES",
-    `  ${notes.length > 0 ? notes : "(none)"}`,
+    "4. GOALS",
+    `  Goal: ${goal || "(not provided)"}`,
+    `  Target weight: ${targetWeightKg ? `${targetWeightKg} kg` : "(optional)"}`,
+    "",
+    "5. HEALTH & PREFERENCES",
+    `  Medical conditions: ${medicalConditions || "(none)"}`,
+    `  Diet preference: ${dietPreference || "(none)"}`,
+    `  Allergies / intolerances: ${allergies || "(none)"}`,
+    `  Disliked foods: ${dislikedFoods || "(none)"}`,
+    "",
+    "6. EATING HABITS",
+    `  Meals per day: ${mealsPerDay || "(not provided)"}`,
+    `  Sugar/carb cravings: ${sugarCravings || "(not provided)"}`,
+    `  Late night eating: ${lateNightEating || "(not provided)"}`,
+    "",
+    "7. ADDITIONAL NOTES",
+    `  ${notes || "(none)"}`,
   ];
 
   const textBody = textSections.join("\n");
@@ -106,31 +132,29 @@ export async function submitPlanInquiry(
     );
 
   row("Full name", fullName);
+  row("Age", age || "(not provided)");
+  row("Gender", gender || "(not provided)");
   row("Email", email);
-  row("Phone", phone.length > 0 ? phone : "(not provided)");
-  row("Age", age.length > 0 ? age : "(not provided)");
-  row("Gender", gender.length > 0 ? gender : "(not provided)");
-  row("Weight", weightKg.length > 0 ? `${weightKg} kg` : "(not provided)");
-  row("Height", heightCm.length > 0 ? `${heightCm} cm` : "(not provided)");
-  row(
-    "Activity level",
-    activityLevel.length > 0 ? activityLevel : "(not provided)",
-  );
-  row("Goal", goal.length > 0 ? goal : "(not provided)");
-  row(
-    "Diet preference",
-    dietPreference.length > 0 ? dietPreference : "(not provided)",
-  );
-  row("Allergies", allergies.length > 0 ? allergies : "(none)");
-  row(
-    "Preferred tier",
-    preferredTier.length > 0 ? preferredTier : "(not specified)",
-  );
-  row("Notes", notes.length > 0 ? notes : "(none)");
+  row("Phone", phone || "(not provided)");
+  row("Weight", weightKg ? `${weightKg} kg` : "(not provided)");
+  row("Height", heightCm ? `${heightCm} cm` : "(not provided)");
+  row("Body Fat %", bodyFatPct ? `${bodyFatPct}%` : "(optional)");
+  row("Activity level", activityLevel || "(not provided)");
+  row("Work type", workType || "(not provided)");
+  row("Goal", goal || "(not provided)");
+  row("Target weight", targetWeightKg ? `${targetWeightKg} kg` : "(optional)");
+  row("Medical conditions", medicalConditions || "(none)");
+  row("Diet preference", dietPreference || "(none)");
+  row("Allergies / intolerances", allergies || "(none)");
+  row("Disliked foods", dislikedFoods || "(none)");
+  row("Meals per day", mealsPerDay || "(not provided)");
+  row("Sugar/carb cravings", sugarCravings || "(not provided)");
+  row("Late night eating", lateNightEating || "(not provided)");
+  row("Additional notes", notes || "(none)");
 
   const htmlBody = `
     <div style="font-family:system-ui,-apple-system,sans-serif;color:#1f2937">
-      <h2 style="margin:0 0 16px;color:#426237;font-size:18px">New custom plan inquiry — ${escapeHtml(fullName)}</h2>
+      <h2 style="margin:0 0 16px;color:#426237;font-size:18px">New Personalized Diet Plan Request — ${escapeHtml(fullName)}</h2>
       <table style="border-collapse:collapse;font-size:13px;line-height:1.55">
         <tbody>${htmlRows.join("")}</tbody>
       </table>

@@ -21,9 +21,17 @@ export function parseNutritionFromDescription(text: string): ParsedDescriptionNu
     return { pro: null, carb: null, fat: null };
   }
 
-  const pro = capture(/Protein\s*:\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t);
-  const carb = capture(/Carbs?\s*:\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t);
-  const fat = capture(/Fat\s*:\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t);
+  const pro =
+    capture(/(?:💪\s*)?(?:Protein|Pro)\s*:?\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t) ??
+    capture(/(\d+(?:\.\d+)?)\s*g?\s*(?:Protein|Pro)\b/i, t);
+
+  const carb =
+    capture(/(?:🍞\s*)?(?:Carbs?|Carbohydrates?)\s*:?\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t) ??
+    capture(/(\d+(?:\.\d+)?)\s*g?\s*Carbs?/i, t);
+
+  const fat =
+    capture(/(?:🧈\s*)?(?:Fats?)\s*:?\s*(\d+(?:\.\d+)?)\s*(?:g|gram(?:s)?)?/i, t) ??
+    capture(/(\d+(?:\.\d+)?)\s*g?\s*Fats?/i, t);
 
   return { pro, carb, fat };
 }
@@ -39,28 +47,69 @@ export function parseGramsValue(raw: string | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+export function cleanUnicodeAndStraySymbols(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/\uFFFD/g, "")
+    .replace(/[🌿📦📊🔥💪🧈🍞]/g, "")
+    .replace(/Ingredients\s*:\s*/gi, "Ingredients: ")
+    .replace(/Portion\s*:\s*/gi, "Portion: ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function parseIngredientsFromDescription(text: string): string | null {
+  if (!text) return null;
+  const m = text.match(/Ingredients\s*:\s*([^N<]+?)(?:Nutrition:|Protein:|Portion:|\n|$)/i);
+  return m && m[1] ? m[1].replace(/<[^>]*>/g, "").replace(/\uFFFD/g, "").trim() : null;
+}
+
+export function parsePortionFromDescription(text: string): string | null {
+  if (!text) return null;
+  const m = text.match(/Portion\s*:\s*([^N<\n]+?)(?:Ingredients:|Nutrition:|Protein:|\n|$)/i);
+  if (m && m[1]) {
+    return cleanUnicodeAndStraySymbols(m[1]);
+  }
+  const m2 = text.match(/(?:Per\s+Jar|Per\s+Portion|Per\s+Bowl|Per\s+Piece|Per\s+Pack|\d+\s*g\b)/i);
+  if (m2 && m2[0]) {
+    return cleanUnicodeAndStraySymbols(m2[0]);
+  }
+  return null;
+}
+
 /**
- * Removes embedded macro segments from copy so the menu shows flavor/story text only.
+ * Removes embedded macro segments and ingredient headers from copy so the menu shows flavor/story text only.
  * Parse first, then strip — stripping uses the same shapes as parsing.
  */
 export function stripEmbeddedNutritionFromDescription(text: string): string {
-  let t = text.replace(/\s+/g, " ").trim();
+  let t = text.replace(/\uFFFD/g, "").replace(/\s+/g, " ").trim();
   if (t.length === 0) return "";
 
+  // Strip whole Ingredients section if present in description
+  t = t.replace(/Ingredients\s*:\s*[^N]+?(?=Nutrition:|$)/gi, " ");
+  t = t.replace(/Ingredients\s*:\s*/gi, " ");
+  t = t.replace(/Nutrition\s*:\s*/gi, " ");
+  t = t.replace(/المكونات\s*:\s*/gi, " ");
+
   const patterns: RegExp[] = [
-    /\s*[|·•]\s*Protein\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
-    /\s*[|·•]\s*Carbs?\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
-    /\s*[|·•]\s*Fat\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
-    /\s*[|·•]\s*(?:Calories?|Energy)\s*:\s*\d+(?:\.\d+)?\s*(?:kcal|cal(?:ories)?)?/gi,
-    /\s*[|·•]\s*Cal\s*:\s*\d+(?:\.\d+)?\s*(?:kcal)?/gi,
-    /\s*[|·•]\s*\d+(?:\.\d+)?\s*(?:kcal|calories)\b/gi,
-    // No leading \b on Protein so "ChocolateProtein: 22g" still matches
+    /📊\s*Nutrition\s*Facts\s*:?/gi,
+    /🔥\s*\d+(?:\.\d+)?\s*(?:kcal|calories?)?/gi,
+    /💪\s*Protein\s*:?\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
+    /🧈\s*Fat\s*:?\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
+    /🍞\s*Carbs?\s*:?\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
+    /\s*[|·•&]\s*Protein\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
+    /\s*[|·•&]\s*Carbs?\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
+    /\s*[|·•&]\s*Fat\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
+    /\s*[|·•&]\s*(?:Calories?|Energy)\s*:\s*\d+(?:\.\d+)?\s*(?:kcal|cal(?:ories)?)?/gi,
+    /\s*[|·•&]\s*Cal\s*:\s*\d+(?:\.\d+)?\s*(?:kcal)?/gi,
+    /\s*[|·•&]\s*\d+(?:\.\d+)?\s*(?:kcal|calories)\b/gi,
     /Protein\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
     /Carbs?\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
     /Fat\s*:\s*\d+(?:\.\d+)?\s*(?:g|gram(?:s)?)?/gi,
     /(?:^|\s)(?:Calories?|Energy)\s*:\s*\d+(?:\.\d+)?\s*(?:kcal|cal(?:ories)?)?/gi,
     /\bCal\s*:\s*\d+(?:\.\d+)?\s*(?:kcal)?/gi,
     /\d+(?:\.\d+)?\s*(?:kcal|calories)\b/gi,
+    /[🔥💪🧈🍞📊🌿📦]/g,
   ];
 
   for (const re of patterns) {
@@ -68,11 +117,15 @@ export function stripEmbeddedNutritionFromDescription(text: string): string {
   }
 
   t = t
-    .replace(/\s*[|·•]\s*/g, " ")
+    .replace(/\s*[|·•&]\s*/g, " ")
     .replace(/\s*[-–—]\s*$/u, "")
     .replace(/\s*[-–—]\s*$/u, "")
     .replace(/\s+/g, " ")
     .trim();
 
-  return t;
+  if (/^(?:Ingredients|Nutrition|المكونات)\s*:?$/i.test(t)) {
+    return "";
+  }
+
+  return cleanUnicodeAndStraySymbols(t);
 }

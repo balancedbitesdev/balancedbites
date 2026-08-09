@@ -3,7 +3,6 @@
 import {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -142,7 +141,7 @@ export function MenuGridClient({ products, locale }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div dir={locale === "ar" ? "rtl" : "ltr"} className="space-y-6">
       <div className="flex flex-col gap-4">
         <label className="relative block w-full sm:max-w-md">
           <span className="sr-only">{t.menu.searchSr}</span>
@@ -263,17 +262,13 @@ export function MenuGridClient({ products, locale }: Props) {
                   <button
                     type="button"
                     onClick={() => setDetailProduct(product)}
-                    className="text-left outline-none transition-colors focus-visible:text-[#2c4224]"
+                    className="text-start outline-none transition-colors focus-visible:text-[#2c4224]"
                   >
                     <h2 className="text-lg font-bold leading-snug tracking-tight text-[#426237] hover:underline decoration-[#426237]/30 underline-offset-4">
                       {product.title}
                     </h2>
                   </button>
-                  {product.descriptionPlain ? (
-                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-500">
-                      {product.descriptionPlain}
-                    </p>
-                  ) : null}
+
 
                   {product.ingredientsPlain ? (
                     <details className="mt-3 rounded-lg bg-[#f4f1eb]/60 px-3 py-2 text-sm ring-1 ring-[#426237]/10">
@@ -284,6 +279,36 @@ export function MenuGridClient({ products, locale }: Props) {
                         {product.ingredientsPlain}
                       </p>
                     </details>
+                  ) : null}
+
+                  {(product.pro !== "—" || product.fat !== "—" || product.carb !== "—" || product.cal !== "—" || Boolean(product.portionPlain)) ? (
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-[#426237]">
+                      {product.portionPlain ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#ac8058]/10 px-2 py-0.5 font-bold tracking-wide text-[#8a613b] ring-1 ring-[#ac8058]/20">
+                          📦 {product.portionPlain}
+                        </span>
+                      ) : null}
+                      {product.cal !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#426237]/10 px-2 py-0.5 font-bold tracking-wide text-[#2c4224] ring-1 ring-[#426237]/20">
+                          CAL: {product.cal}
+                        </span>
+                      ) : null}
+                      {product.pro !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
+                          PRO: {product.pro}
+                        </span>
+                      ) : null}
+                      {product.fat !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
+                          FAT: {product.fat}
+                        </span>
+                      ) : null}
+                      {product.carb !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
+                          CARB: {product.carb}
+                        </span>
+                      ) : null}
+                    </div>
                   ) : null}
 
                   <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -381,13 +406,12 @@ function ProductCardImageSlide({ url, alt }: { url: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
-  useLayoutEffect(() => {
-    setLoaded(false);
-    const img = imgRef.current;
+  const setImgRef = useCallback((img: HTMLImageElement | null) => {
+    imgRef.current = img;
     if (img?.complete && img.naturalWidth > 0) {
       setLoaded(true);
     }
-  }, [url]);
+  }, []);
 
   return (
     <>
@@ -401,7 +425,7 @@ function ProductCardImageSlide({ url, alt }: { url: string; alt: string }) {
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element -- Shopify CDN */}
       <img
-        ref={imgRef}
+        ref={setImgRef}
         src={url}
         alt={alt}
         decoding="async"
@@ -543,6 +567,7 @@ function ProductDetailsDialog({
   const [imageIdx, setImageIdx] = useState(0);
   const [mounted, setMounted] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const contentScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -567,6 +592,7 @@ function ProductDetailsDialog({
     setAllergies("");
     setNotes("");
     setImageIdx(0);
+    contentScrollRef.current?.scrollTo({ top: 0 });
     /* eslint-enable react-hooks/set-state-in-effect */
     const focusTimer = window.setTimeout(() => {
       closeButtonRef.current?.focus();
@@ -595,7 +621,8 @@ function ProductDetailsDialog({
 
   const panel = (
     <div
-      className="fixed inset-0 z-[1100] flex items-end justify-center sm:items-center sm:p-6"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      className="fixed inset-0 z-[1100] flex items-end justify-center px-4 py-5 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={product.title}
@@ -609,7 +636,7 @@ function ProductDetailsDialog({
       />
 
       <div
-        className="bb-modal-panel relative flex max-h-[min(94dvh,920px)] w-full max-w-4xl flex-col overflow-hidden rounded-t-[2rem] bg-white shadow-2xl ring-1 ring-[#426237]/15 sm:max-h-[94vh] sm:rounded-[2rem]"
+        className="bb-modal-panel relative flex max-h-[calc(100dvh-2.5rem)] w-full max-w-[min(100%,27rem)] flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-2xl ring-1 ring-[#426237]/15 sm:max-h-[calc(100dvh-3rem)] sm:max-w-[min(100%,58rem)] sm:rounded-[2rem] lg:max-w-[min(92vw,58rem)]"
         style={{
           animation:
             "bb-modal-rise 280ms cubic-bezier(0.32, 0.72, 0, 1) both",
@@ -634,8 +661,8 @@ function ProductDetailsDialog({
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 overflow-y-auto lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-10">
-          <div className="relative aspect-[4/3] w-full shrink-0 bg-[#f4f1eb] lg:aspect-auto lg:min-h-[min(28rem,52dvh)]">
+        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,1fr)_minmax(0,0.92fr)]">
+          <div className="relative min-w-0 shrink-0 bg-[#f4f1eb] max-lg:h-[clamp(9.5rem,34dvh,14rem)] lg:min-h-0">
             {currentImage != null ? (
               // eslint-disable-next-line @next/next/no-img-element -- Shopify CDN
               <img
@@ -671,8 +698,11 @@ function ProductDetailsDialog({
             ) : null}
           </div>
 
-          <div className="flex min-h-0 flex-col gap-6 px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-10 sm:gap-7 sm:px-9 sm:pb-12 sm:pt-11 lg:gap-8 lg:px-10 lg:pb-14 lg:pt-12">
-            <div className="space-y-2">
+          <div
+            ref={contentScrollRef}
+            className="flex min-h-0 min-w-0 flex-col gap-6 overflow-y-auto overscroll-contain px-6 pb-[max(2.25rem,env(safe-area-inset-bottom))] pt-8 [scrollbar-gutter:stable] sm:gap-7 sm:px-9 sm:pb-12 sm:pt-11 lg:gap-7 lg:px-8 lg:pb-10 lg:pt-10"
+          >
+            <div className="space-y-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ac8058]">
                 {product.categoryLabel}
               </p>
@@ -684,24 +714,55 @@ function ProductDetailsDialog({
               </p>
             </div>
 
-            {product.descriptionPlain ? (
-              <p className="text-sm leading-relaxed text-gray-600 sm:text-[0.9375rem] sm:leading-7">
-                {product.descriptionPlain}
-              </p>
-            ) : null}
+
 
             {product.ingredientsPlain ? (
-              <details className="rounded-xl bg-[#f4f1eb]/60 px-4 py-3.5 ring-1 ring-[#426237]/10 sm:px-5 sm:py-4">
+              <details className="min-w-0 rounded-xl bg-[#f4f1eb]/60 px-4 py-3.5 ring-1 ring-[#426237]/10 sm:px-5 sm:py-4">
                 <summary className="cursor-pointer text-sm font-semibold text-[#426237]">
                   {locale === "ar" ? "المكونات" : "Ingredients"}
                 </summary>
-                <p className="mt-2.5 text-xs leading-relaxed text-gray-600 sm:text-sm">
+                <p className="mt-2.5 break-words text-xs leading-relaxed text-gray-600 sm:text-sm">
                   {product.ingredientsPlain}
                 </p>
               </details>
             ) : null}
 
-            <div className="flex flex-col gap-4 rounded-2xl border border-amber-200/70 bg-amber-50/50 p-4 sm:gap-4 sm:p-5 lg:p-6">
+            {(product.pro !== "—" || product.fat !== "—" || product.carb !== "—" || product.cal !== "—" || Boolean(product.portionPlain)) ? (
+              <div className="rounded-2xl border border-[#e2dacd] bg-[#f4f1eb] p-4 text-[#426237] shadow-sm">
+                <strong className="block text-sm font-semibold mb-2.5">
+                  {locale === "ar" ? "القيمة الغذائية والكمية" : "Nutrition Facts & Serving Size"}
+                </strong>
+                <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-medium">
+                  {product.portionPlain ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#ac8058]/10 px-3 py-1.5 font-bold text-[#8a613b] shadow-sm ring-1 ring-[#ac8058]/20">
+                      📦 {locale === "ar" ? "الحجم / الوجبة" : "Serving"}: <strong className="font-extrabold text-[#8a613b]">{product.portionPlain}</strong>
+                    </span>
+                  ) : null}
+                  {product.cal !== "—" ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#426237]/10 px-3 py-1.5 font-bold text-[#2c4224] shadow-sm ring-1 ring-[#426237]/20">
+                      🔥 {locale === "ar" ? "سعرات حرارية" : "Calories"}: <strong className="font-extrabold text-[#2c4224]">{product.cal}</strong>
+                    </span>
+                  ) : null}
+                  {product.pro !== "—" ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 shadow-sm ring-1 ring-[#426237]/10">
+                      {locale === "ar" ? "بروتين" : "Protein - PRO"}: <strong className="font-bold text-[#426237]">{product.pro}</strong>
+                    </span>
+                  ) : null}
+                  {product.fat !== "—" ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 shadow-sm ring-1 ring-[#426237]/10">
+                      {locale === "ar" ? "دهون" : "Fat - FAT"}: <strong className="font-bold text-[#426237]">{product.fat}</strong>
+                    </span>
+                  ) : null}
+                  {product.carb !== "—" ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 shadow-sm ring-1 ring-[#426237]/10">
+                      {locale === "ar" ? "كارب" : "Carbs - CARB"}: <strong className="font-bold text-[#426237]">{product.carb}</strong>
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="flex min-w-0 flex-col gap-5 rounded-2xl border border-amber-200/70 bg-amber-50/50 p-5 sm:gap-4 sm:p-5 lg:p-5">
               <div className="space-y-2">
                 <label
                   htmlFor={`allergies-${product.id}`}

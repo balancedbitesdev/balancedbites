@@ -95,7 +95,7 @@ export const dict = {
       eyebrow: "Our curated laboratory",
       title: "Our Menu",
       intro:
-        "Every meal is nutritionist-approved, macro-balanced, and crafted from premium natural ingredients.",
+        "Every meal is Nutritionist-approved, perfectly balanced, and crafted from premium natural ingredients.",
       script: "Healthy food that actually tastes like a dream.",
       deliveryTitle: "Delivery & pickup",
       deliveryBody:
@@ -141,7 +141,7 @@ export const dict = {
         },
         {
           title: "Adults stay energized",
-          body: "Balanced macros that fuel you from morning to evening without the crash.",
+          body: "Balanced nutrition that keeps you energized throughout the day",
         },
         {
           title: "Long-term health",
@@ -177,10 +177,10 @@ export const dict = {
         "Everything is shown in one place: what we avoid, what we use instead, and the core ingredients we cook with daily.",
       never: "Never",
       insteadUse: "Instead, we use",
-      ready: "Ready to start?",
+      ready: "READY TO START?",
       readyTitle: "Design your plate, build your week.",
       readyBody:
-        "Protein, sides, salad, and dessert - all chosen by you. Build your weekly package and get a free meal on us.",
+        "Protein, sides, salad, and dessert all chosen by you.",
       chatWhatsapp: "Chat on WhatsApp",
     },
     about: {
@@ -188,17 +188,17 @@ export const dict = {
       founded: "Founded by Dalia",
       role: "Certified food nutritionist",
       spotlight: "Founder Spotlight",
-      title: "The person behind the menu",
+      title: "The person behind the Balanced Bites",
       intro: "Nutrition, taste, and honesty on the plate-by design.",
       p1: "As a certified food nutritionist with nearly a year of hands-on experience developing personalized healthy eating plans, Dalia Seoudi brings deep knowledge of clean eating, balanced meal creation, and ingredient integrity.",
       p2: "Her goal is to support individuals in achieving better health by offering meals and desserts that reflect both nutritional value and culinary enjoyment. Inspired by real transformations, Dalia founded Balanced Bites to provide clean, delicious, and nutritionist-approved options for everyday life.",
       quote: "Clean food should feel warm, generous, and easy to trust.",
-      philosophy: "Our philosophy",
+      philosophy: "About Balanced Bites",
       philosophyTitle: "Food is information for your hormones.",
       philosophyText:
-        "At Balanced Bites, we follow a hormone-based approach to nutrition because balanced hormones support better energy, metabolism, mood, and fat burning. Our meals are built around high protein, healthy fats, clean carbs, and fiber to support your body's natural rhythm.",
+        "At Balanced Bites, we believe that food is more than just calories—it’s information that directly affects your hormones. That’s why we follow a hormone-based approach to nutrition. Because when your hormones are balanced, everything works better—your energy, metabolism, mood, and even fat burning. Our meals are built around high protein, healthy fats, clean carbohydrates, and fiber to help stabilize blood sugar, reduce cravings, and support your body’s natural rhythm. We focus on real, natural ingredients because they help lower inflammation, improve recovery, and allow your body to function the way it was designed to.",
       philosophyClosing:
-        "We're not just offering food - we're helping you understand your body and build a sustainable, healthy lifestyle.",
+        "At Balanced Bites, we’re not just offering food—we’re helping you understand your body and build a sustainable, healthy lifestyle.",
     },
     learn: {
       eyebrow: "Nutrition hub",
@@ -365,7 +365,7 @@ export const dict = {
         },
         {
           title: "طاقة للكبار طول اليوم",
-          body: "ماكروز متوازنة تشبع وتدي طاقة من غير هبوط آخر اليوم.",
+          body: "تغذية متوازنة تحافظ على طاقتك طول اليوم.",
         },
         {
           title: "صحة على المدى الطويل",
@@ -404,7 +404,7 @@ export const dict = {
       ready: "جاهز تبدأ؟",
       readyTitle: "اختار طبقك وابني أسبوعك.",
       readyBody:
-        "بروتين، سايد، سلطة، وديسيرت - كله باختيارك. ابني باكدج الأسبوع وخد وجبة هدية.",
+        "بروتين، سايد، سلطة، وديسيرت - كله باختيارك. ابني باكدج الأسبوع وخد ديسيرت هدية.",
       chatWhatsapp: "كلّمنا على واتساب",
     },
     about: {
@@ -412,17 +412,17 @@ export const dict = {
       founded: "أسستها داليا",
       role: "أخصائية تغذية معتمدة",
       spotlight: "تعرف على المؤسسة",
-      title: "الشخص اللي ورا المنيو",
+      title: "الشخص اللي ورا Balanced Bites",
       intro: "تغذية، طعم، ووضوح في كل طبق.",
       p1: "داليا سُعودي أخصائية تغذية معتمدة وعندها خبرة عملية في تصميم خطط أكل صحية ومناسبة لكل شخص. خبرتها مركزة على الأكل النضيف، الوجبات المتوازنة، والمكونات اللي نثق فيها.",
       p2: "هدفها تساعد الناس توصل لصحة أحسن من خلال وجبات وحلويات قيمتها الغذائية عالية وطعمها حلو. ومن قصص التحول الحقيقية، بدأت Balanced Bites عشان تقدم اختيارات نضيفة، لذيذة، وموافَق عليها من أخصائية تغذية.",
       quote: "الأكل النضيف لازم يبقى دافي، كريم، وسهل تثق فيه.",
-      philosophy: "فلسفتنا",
+      philosophy: "عن Balanced Bites",
       philosophyTitle: "الأكل رسالة لهرمونات جسمك.",
       philosophyText:
-        "في Balanced Bites بنمشي بطريقة تغذية مبنية على الهرمونات، عشان توازن الهرمونات يساعد طاقتك، الميتابوليزم، المزاج، وحرق الدهون. وجباتنا مبنية على بروتين عالي، دهون صحية، كارب نضيف، وفايبر عشان تدعم رتم جسمك الطبيعي.",
+        "في Balanced Bites بنؤمن إن الأكل أكتر من مجرد سعرات حرارية—ده معلومات بتأثر مباشرة على هرموناتك. عشان كده بنمشي بطريقة تغذية مبنية على الهرمونات. عشان لما الهرمونات تبقى متوازنة، كل حاجة بتشتغل أحسن—طاقتك، الميتابوليزم، المزاج، وحرق الدهون. وجباتنا مبنية على بروتين عالي، دهون صحية، كارب نضيف، وفايبر عشان نثبت سكر الدم، نقلل الكرايفنج، وندعم رتم جسمك الطبيعي. بنركز على مكونات طبيعية وحقيقية تساعد تقلل الالتهاب وتخلي جسمك يشتغل بأحسن شكل.",
       philosophyClosing:
-        "إحنا مش بنقدم أكل بس - إحنا بنساعدك تفهم جسمك وتبني لايف ستايل صحي ومستمر.",
+        "في Balanced Bites، إحنا مش بنقدم أكل بس—إحنا بنساعدك تفهم جسمك وتبني لايف ستايل صحي ومستمر.",
     },
     learn: {
       eyebrow: "مركز التغذية",

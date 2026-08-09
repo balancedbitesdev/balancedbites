@@ -21,28 +21,43 @@ const WHATSAPP_GENERAL = `https://wa.me/${WHATSAPP_DIGITS}?text=${encodeURICompo
 
 const PAGE_COPY = {
   en: {
-    eyebrow: "Custom eating plans",
-    title: "Request your custom plan",
+    eyebrow: "Personalized Nutrition Plan",
+    title: "Get Your Personalized Diet Plan",
     intro:
-      "Share a few details with us and our certified nutritionist will get back to you by email with a plan tailored to your body, goals, and preferences - plus pricing for the subscription that fits you best.",
+      "fill in your details to receive a customized plan based on your body and goals",
     tiers: [
       {
         badge: "Starter",
-        title: "1-month plan",
-        blurb: "A focused first month with a custom plan and nutritionist support.",
-        highlights: ["Personalized macros", "Weekly meal guidance", "Email support"],
+        title: "1-Month Plan",
+        blurb: "A focused start to reset your habits and understand your body.",
+        highlights: [
+          "Personalized nutrition plan",
+          "Weekly meal plan guidance",
+          "Simple, sustainable approach",
+          "Ongoing support via email",
+        ],
       },
       {
         badge: "Committed",
-        title: "3-month plan",
-        blurb: "Steady results with monthly check-ins and plan adjustments.",
-        highlights: ["Everything in Starter", "Monthly plan refresh", "Priority replies"],
+        title: "3-Month Plan",
+        blurb: "Build consistency and start seeing real, lasting results.",
+        highlights: [
+          "Everything in Starter",
+          "Monthly plan updates",
+          "Progress tracking & adjustments",
+          "Priority support",
+        ],
       },
       {
         badge: "Transform",
-        title: "6-month plan",
-        blurb: "Deep support for habit change and long-term transformation.",
-        highlights: ["Everything in Committed", "Bi-weekly adjustments", "Direct WhatsApp line"],
+        title: "6-Month Plan",
+        blurb: "A complete transformation with deeper support and long-term results.",
+        highlights: [
+          "Everything in 3-Month Plan",
+          "Bi-weekly adjustments",
+          "Direct WhatsApp support",
+          "Habit-building system",
+        ],
       },
     ],
     pricing: "Pricing shared privately after we've reviewed your goals -",
@@ -50,10 +65,10 @@ const PAGE_COPY = {
     mostPopular: "Most popular",
   },
   ar: {
-    eyebrow: "خطط أكل مخصصة",
-    title: "اطلب خطة أكلك المخصصة",
+    eyebrow: "خطة تغذية مخصصة",
+    title: "احصل على خطة تغذيتك المخصصة",
     intro:
-      "شاركنا شوية تفاصيل، وأخصائية التغذية هترد عليك بإيميل فيه خطة مناسبة لجسمك، هدفك، وتفضيلاتك - ومعاها سعر الاشتراك الأنسب ليك.",
+      "املا تفاصيلك لاستلام خطة مخصصة بناءً على جسمك وأهدافك",
     tiers: [
       {
         badge: "بداية",
