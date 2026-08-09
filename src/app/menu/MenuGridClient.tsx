@@ -281,39 +281,27 @@ export function MenuGridClient({ products, locale }: Props) {
                     </details>
                   ) : null}
 
-                  {(product.pro !== "—" || product.fat !== "—" || product.carb !== "—" || product.cal !== "—" || Boolean(product.portionPlain)) ? (
-                    <div className="mt-3 space-y-1.5">
-                      <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#426237]">
-                        {product.portionPlain ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-[#ac8058]/10 px-2 py-0.5 font-bold tracking-wide text-[#8a613b] ring-1 ring-[#ac8058]/20">
-                            📦 {product.portionPlain}
-                          </span>
-                        ) : null}
-                        {product.cal !== "—" ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-[#426237]/10 px-2 py-0.5 font-bold tracking-wide text-[#2c4224] ring-1 ring-[#426237]/20">
-                            CAL: {product.cal}
-                          </span>
-                        ) : null}
-                        {product.pro !== "—" ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
-                            PRO: {product.pro}
-                          </span>
-                        ) : null}
-                        {product.fat !== "—" ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
-                            FAT: {product.fat}
-                          </span>
-                        ) : null}
-                        {product.carb !== "—" ? (
-                          <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
-                            CARB: {product.carb}
-                          </span>
-                        ) : null}
-                      </div>
-                      {product.servingNote ? (
-                        <p className="text-[11px] font-medium text-[#8a613b]">
-                          💡 {product.servingNote}
-                        </p>
+                  {(product.pro !== "—" || product.fat !== "—" || product.carb !== "—" || product.cal !== "—") ? (
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-[#426237]">
+                      {product.cal !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#426237]/10 px-2 py-0.5 font-bold tracking-wide text-[#2c4224] ring-1 ring-[#426237]/20">
+                          CAL: {product.cal}
+                        </span>
+                      ) : null}
+                      {product.pro !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
+                          PRO: {product.pro}
+                        </span>
+                      ) : null}
+                      {product.fat !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
+                          FAT: {product.fat}
+                        </span>
+                      ) : null}
+                      {product.carb !== "—" ? (
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f4f1eb] px-2 py-0.5 font-semibold tracking-wide ring-1 ring-[#426237]/10">
+                          CARB: {product.carb}
+                        </span>
                       ) : null}
                     </div>
                   ) : null}
@@ -734,17 +722,12 @@ function ProductDetailsDialog({
               </details>
             ) : null}
 
-            {(product.pro !== "—" || product.fat !== "—" || product.carb !== "—" || product.cal !== "—" || Boolean(product.portionPlain)) ? (
-              <div className="space-y-2 rounded-2xl border border-[#e2dacd] bg-[#f4f1eb] p-4 text-[#426237] shadow-sm">
-                <strong className="block text-sm font-semibold">
-                  {locale === "ar" ? "القيمة الغذائية والكمية" : "Nutrition Facts & Serving Size"}
+            {(product.pro !== "—" || product.fat !== "—" || product.carb !== "—" || product.cal !== "—") ? (
+              <div className="rounded-2xl border border-[#e2dacd] bg-[#f4f1eb] p-4 text-[#426237] shadow-sm">
+                <strong className="block text-sm font-semibold mb-2.5">
+                  {locale === "ar" ? "القيمة الغذائية" : "Nutrition Facts"}
                 </strong>
                 <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-medium">
-                  {product.portionPlain ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#ac8058]/10 px-3 py-1.5 font-bold text-[#8a613b] shadow-sm ring-1 ring-[#ac8058]/20">
-                      📦 {locale === "ar" ? "العبوة / الوجبة" : "Serving"}: <strong className="font-extrabold text-[#8a613b]">{product.portionPlain}</strong>
-                    </span>
-                  ) : null}
                   {product.cal !== "—" ? (
                     <span className="inline-flex items-center gap-1.5 rounded-lg bg-[#426237]/10 px-3 py-1.5 font-bold text-[#2c4224] shadow-sm ring-1 ring-[#426237]/20">
                       🔥 {locale === "ar" ? "سعرات حرارية" : "Calories"}: <strong className="font-extrabold text-[#2c4224]">{product.cal}</strong>
@@ -766,11 +749,6 @@ function ProductDetailsDialog({
                     </span>
                   ) : null}
                 </div>
-                {product.servingNote ? (
-                  <div className="mt-2 rounded-xl bg-white/70 p-2.5 text-xs text-[#8a613b] ring-1 ring-[#ac8058]/20">
-                    💡 <strong>{locale === "ar" ? "توضيح السعر والكمية:" : "Price & Portion Clarity:"}</strong> {product.servingNote}
-                  </div>
-                ) : null}
               </div>
             ) : null}
 
