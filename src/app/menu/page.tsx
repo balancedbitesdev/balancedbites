@@ -147,11 +147,45 @@ const INGREDIENTS_OVERRIDE: Record<string, { en: string; ar: string }> = {
 };
 
 const PORTION_OVERRIDE: Record<string, { en: string; ar: string }> = {
-  "cottage-cheese-black-olive": { en: "250g Jar", ar: "برطمان ٢٥٠ جم" },
-  "cottage-cheese-green-olive": { en: "250g Jar", ar: "برطمان ٢٥٠ جم" },
-  "cottage-cheese-red-pepper": { en: "250g Jar", ar: "برطمان ٢٥٠ جم" },
-  "cottage-cheese-tomato-basil": { en: "250g Jar", ar: "برطمان ٢٥٠ جم" },
-  "seasonal-sauteed-vegetables": { en: "250g Portion", ar: "وجبة ٢٥٠ جم" },
+  "cottage-cheese-black-olive": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "cottage-cheese-green-olive": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "cottage-cheese-red-pepper": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "cottage-cheese-tomato-basil": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "seasonal-sauteed-vegetables": { en: "1 Side Portion (250g)", ar: "طبق جانبي (٢٥٠ جم)" },
+  "coconut-truffles": { en: "Pack of 3 Truffles", ar: "عبوة ٣ قطع ترافلز" },
+  "chocolate-truffles": { en: "Pack of 3 Truffles", ar: "عبوة ٣ قطع ترافلز" },
+  "plain-cookies": { en: "Pack of 2 Cookies", ar: "عبوة ٢ قطعة كوكيز" },
+  "almond-cranberry-cookies": { en: "Pack of 2 Cookies", ar: "عبوة ٢ قطعة كوكيز" },
+  "cookies-fries": { en: "Pack of Cookies Fries", ar: "عبوة بطاطس كوكيز" },
+  "brownies": { en: "1 Large Piece (85g)", ar: "قطعة واحدة كبيرة (٨٥ جم)" },
+  "chocolate-cupcake": { en: "1 Cupcake", ar: "كب كيك واحدة" },
+  "chocolate-muffin": { en: "1 Large Muffin", ar: "مافن واحدة كبيرة" },
+  "vanilla-cake-loaf": { en: "1 Cake Loaf", ar: "قالب كيك كامل" },
+  "chocolate-cake-loaf": { en: "1 Cake Loaf", ar: "قالب كيك كامل" },
+  "lazy-cake": { en: "1 Generous Slice", ar: "شريحة ليزي كيك كبيرة" },
+  "basbosa": { en: "1 Generous Slice", ar: "قطعة بسبوسة كبيرة" },
+  "protein-jar-chocolate": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "protein-jar-pistachio": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "protein-jar-strawberry": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+  "protein-jar-blueberry": { en: "1 Jar (250g)", ar: "برطمان واحد (٢٥٠ جم)" },
+};
+
+const SERVING_NOTE_OVERRIDE: Record<string, { en: string; ar: string }> = {
+  "cottage-cheese-black-olive": { en: "Price & macros for full 250g jar", ar: "السعر والقيمة الغذائية للبرطمان بالكامل (٢٥٠ جم)" },
+  "cottage-cheese-green-olive": { en: "Price & macros for full 250g jar", ar: "السعر والقيمة الغذائية للبرطمان بالكامل (٢٥٠ جم)" },
+  "cottage-cheese-red-pepper": { en: "Price & macros for full 250g jar", ar: "السعر والقيمة الغذائية للبرطمان بالكامل (٢٥٠ جم)" },
+  "cottage-cheese-tomato-basil": { en: "Price & macros for full 250g jar", ar: "السعر والقيمة الغذائية للبرطمان بالكامل (٢٥٠ جم)" },
+  "seasonal-sauteed-vegetables": { en: "Price & macros per 250g portion", ar: "السعر والقيمة الغذائية للوجبة بالكامل (٢٥٠ جم)" },
+  "coconut-truffles": { en: "Price for full pack of 3 pcs · Macros shown per piece", ar: "السعر للعبوة كاملاً (٣ قطع) · السعرات لكل قطعة واحدة" },
+  "chocolate-truffles": { en: "Price for full pack of 3 pcs · Macros shown per piece", ar: "السعر للعبوة كاملاً (٣ قطع) · السعرات لكل قطعة واحدة" },
+  "plain-cookies": { en: "Price for full pack of 2 pcs · Macros shown per cookie", ar: "السعر للعبوة كاملاً (قطعتين) · السعرات لكل كوكيز" },
+  "almond-cranberry-cookies": { en: "Price for full pack of 2 pcs · Macros shown per cookie", ar: "السعر للعبوة كاملاً (قطعتين) · السعرات لكل كوكيز" },
+  "cookies-fries": { en: "Price & macros for full pack", ar: "السعر والقيمة الغذائية للعبوة بالكامل" },
+  "brownies": { en: "Price & macros per 1 large piece", ar: "السعر والقيمة الغذائية للقطعة الواحدة" },
+  "chocolate-cupcake": { en: "Price & macros per cupcake", ar: "السعر والقيمة الغذائية للكب كيك الواحدة" },
+  "chocolate-muffin": { en: "Price & macros per muffin", ar: "السعر والقيمة الغذائية للمافن الواحدة" },
+  "vanilla-cake-loaf": { en: "Price & macros for full cake loaf", ar: "السعر والقيمة الغذائية لقالب الكيك بالكامل" },
+  "chocolate-cake-loaf": { en: "Price & macros for full cake loaf", ar: "السعر والقيمة الغذائية لقالب الكيك بالكامل" },
 };
 
 function getCleanIngredients(
@@ -558,13 +592,26 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
   }
   if (!portionPlain) {
     if (node.handle.includes("cottage-cheese") || node.handle.includes("protein-jar")) {
-      portionPlain = locale === "ar" ? "برطمان ٢٥٠ جم" : "250g Jar";
+      portionPlain = locale === "ar" ? "برطمان واحد (٢٥٠ جم)" : "1 Jar (250g)";
     } else if (filterKey === "keto_desserts") {
-      portionPlain = locale === "ar" ? "وجبة واحدة" : "1 Serving";
+      portionPlain = locale === "ar" ? "قطعة / وجبة واحدة" : "1 Serving";
     } else if (filterKey === "frozen") {
-      portionPlain = locale === "ar" ? "عبوة" : "Per Pack";
+      portionPlain = locale === "ar" ? "عبوة فروزن" : "1 Frozen Pack";
     } else {
-      portionPlain = locale === "ar" ? "وجبة واحدة" : "1 Portion";
+      portionPlain = locale === "ar" ? "وجبة واحدة كاملا (~٣٠٠ جم)" : "1 Full Meal Portion (~300g)";
+    }
+  }
+
+  let servingNote = SERVING_NOTE_OVERRIDE[node.handle]?.[locale];
+  if (!servingNote) {
+    if (node.handle.includes("cottage-cheese") || node.handle.includes("protein-jar")) {
+      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للبرطمان بالكامل" : "Price & macros for full 250g jar";
+    } else if (filterKey === "keto_desserts") {
+      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للقطعة الواحدة" : "Price & macros per serving/piece";
+    } else if (filterKey === "frozen") {
+      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للكيس الفروزن بالكامل" : "Price & macros for full frozen pack";
+    } else {
+      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للوجبة بالكامل" : "Price & macros per full meal portion";
     }
   }
 
@@ -593,6 +640,7 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
         : stripHtml(rawIng)
     ),
     portionPlain,
+    servingNote,
     priceLabel: formatMoney(amount, currencyCode),
     variantId,
     images,

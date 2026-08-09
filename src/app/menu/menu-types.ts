@@ -19,8 +19,10 @@ export type MenuProductSerialized = {
   descriptionPlain: string;
   /** Plain-text ingredients when metafield is set; otherwise cleaned description */
   ingredientsPlain: string;
-  /** Serving size / portion info e.g. "250g Jar", "1 Portion" */
+  /** Serving size & piece count e.g. "1 Jar (250g)", "Pack of 3 Truffles", "1 Full Meal (300g)" */
   portionPlain: string;
+  /** Per-serving / per-piece note e.g. "Price is for full pack of 3 pcs · Macros listed per piece" */
+  servingNote: string;
   priceLabel: string;
   /** Storefront ProductVariant GID for Cart API */
   variantId: string | null;
