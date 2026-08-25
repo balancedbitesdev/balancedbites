@@ -59,18 +59,49 @@ export function cleanUnicodeAndStraySymbols(text: string): string {
 }
 
 export function parseIngredientsFromDescription(text: string): string | null {
-  if (!text) return null;
-  const m = text.match(/Ingredients\s*:\s*([^N<]+?)(?:Nutrition:|Protein:|Portion:|\n|$)/i);
-  return m && m[1] ? m[1].replace(/<[^>]*>/g, "").replace(/\uFFFD/g, "").trim() : null;
+  if (!text || !text.trim()) return null;
+
+  const normalized = text
+    .replace(/<\/(?:p|div|li|h[1-6])>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ");
+
+  const match = normalized.match(
+    /(?:Ingredients|Ingredient|المكونات)\s*[:\-]?\s*([\s\S]+?)(?=(?:Nutrition\b|Nutrition Facts|Protein\b|Pro\b|Carbs?\b|Carbohydrates?\b|Fats?\b|Calories?\b|Cal\b|Energy\b|Portion\b|Per\s+(?:Jar|Portion|Pack|Bowl|Piece)\b|💪|🍞|🧈|🔥|📊|<|\n\s*\d+\s*(?:g|gm|grams|kg|ml|oz)\b|$))/i
+  );
+
+  if (!match || !match[1]) return null;
+
+  let ing = match[1]
+    .replace(/\uFFFD/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  ing = ing.replace(/\s+\d+\s*(?:gm|g|grams|kg|ml|oz)\b$/i, "").trim();
+
+  if (ing.length < 2) return null;
+
+  return ing;
 }
 
 export function parsePortionFromDescription(text: string): string | null {
-  if (!text) return null;
-  const m = text.match(/Portion\s*:\s*([^N<\n]+?)(?:Ingredients:|Nutrition:|Protein:|\n|$)/i);
+  if (!text || !text.trim()) return null;
+
+  const normalized = text
+    .replace(/<\/(?:p|div|li|h[1-6])>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ");
+
+  const m = normalized.match(
+    /Portion\s*[:\-]?\s*([\s\S]+?)(?=(?:Ingredients|Ingredient|المكونات|Nutrition|Protein|Pro|Carbs|Fat|Calories|Cal|Energy|💪|🍞|🧈|🔥|📊|<|\n|$))/i
+  );
   if (m && m[1]) {
-    return cleanUnicodeAndStraySymbols(m[1]);
+    const cleaned = cleanUnicodeAndStraySymbols(m[1]);
+    if (cleaned.length > 0) return cleaned;
   }
-  const m2 = text.match(/(?:Per\s+Jar|Per\s+Portion|Per\s+Bowl|Per\s+Piece|Per\s+Pack|\d+\s*g\b)/i);
+  const m2 = normalized.match(/(?:Per\s+Jar|Per\s+Portion|Per\s+Bowl|Per\s+Piece|Per\s+Pack|\d+\s*(?:g|gm)\b)/i);
   if (m2 && m2[0]) {
     return cleanUnicodeAndStraySymbols(m2[0]);
   }
@@ -86,10 +117,13 @@ export function stripEmbeddedNutritionFromDescription(text: string): string {
   if (t.length === 0) return "";
 
   // Strip whole Ingredients section if present in description
-  t = t.replace(/Ingredients\s*:\s*[^N]+?(?=Nutrition:|$)/gi, " ");
-  t = t.replace(/Ingredients\s*:\s*/gi, " ");
-  t = t.replace(/Nutrition\s*:\s*/gi, " ");
-  t = t.replace(/المكونات\s*:\s*/gi, " ");
+  t = t.replace(
+    /(?:Ingredients|Ingredient|المكونات)\s*[:\-]?\s*[\s\S]+?(?=(?:Nutrition\b|Nutrition Facts|Protein\b|Pro\b|Carbs?\b|Carbohydrates?\b|Fats?\b|Calories?\b|Cal\b|Energy\b|Portion\b|Per\s+(?:Jar|Portion|Pack|Bowl|Piece)\b|💪|🍞|🧈|🔥|📊|<|$))/gi,
+    " "
+  );
+  t = t.replace(/(?:Ingredients|Ingredient|المكونات)\s*[:\-]?\s*/gi, " ");
+  t = t.replace(/Nutrition\s*[:\-]?\s*/gi, " ");
+  t = t.replace(/المكونات\s*[:\-]?\s*/gi, " ");
 
   const patterns: RegExp[] = [
     /📊\s*Nutrition\s*Facts\s*:?/gi,

@@ -128,7 +128,15 @@ const INGREDIENTS_OVERRIDE: Record<string, { en: string; ar: string }> = {
     en: "Cottage Cheese, Black Olives, Zaatar, Extra Virgin Olive Oil",
     ar: "جبنة قريش، زيتون أسود، زعتر، زيت زيتون بكر ممتاز",
   },
+  "cottage-cheese-with-black-olive-zaatar": {
+    en: "Cottage Cheese, Black Olives, Zaatar, Extra Virgin Olive Oil",
+    ar: "جبنة قريش، زيتون أسود، زعتر، زيت زيتون بكر ممتاز",
+  },
   "cottage-cheese-green-olive": {
+    en: "Cottage Cheese, Green Olives, Fresh Dill, Extra Virgin Olive Oil",
+    ar: "جبنة قريش، زيتون أخضر، شبت طازج، زيت زيتون بكر ممتاز",
+  },
+  "cottage-cheese-with-green-olive-dill": {
     en: "Cottage Cheese, Green Olives, Fresh Dill, Extra Virgin Olive Oil",
     ar: "جبنة قريش، زيتون أخضر، شبت طازج، زيت زيتون بكر ممتاز",
   },
@@ -136,7 +144,15 @@ const INGREDIENTS_OVERRIDE: Record<string, { en: string; ar: string }> = {
     en: "Cottage Cheese, Roasted Red Pepper, Fresh Parsley, Extra Virgin Olive Oil",
     ar: "جبنة قريش، فلفل أحمر مشوي، بقدونس طازج، زيت زيتون بكر ممتاز",
   },
+  "cottage-cheese-with-red-pepper-parsley": {
+    en: "Cottage Cheese, Roasted Red Pepper, Fresh Parsley, Extra Virgin Olive Oil",
+    ar: "جبنة قريش، فلفل أحمر مشوي، بقدونس طازج، زيت زيتون بكر ممتاز",
+  },
   "cottage-cheese-tomato-basil": {
+    en: "Cottage Cheese, Roasted Tomatoes, Fresh Basil, Walnuts, Extra Virgin Olive Oil",
+    ar: "جبنة قريش، طماطم مشوية، ريحان طازج، عين جمل، زيت زيتون بكر ممتاز",
+  },
+  "cottage-cheese-with-tomato-basil-walnut": {
     en: "Cottage Cheese, Roasted Tomatoes, Fresh Basil, Walnuts, Extra Virgin Olive Oil",
     ar: "جبنة قريش، طماطم مشوية، ريحان طازج، عين جمل، زيت زيتون بكر ممتاز",
   },
@@ -582,7 +598,7 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
 
   let baseIng = (mf.ingredients && mf.ingredients.trim().length > 0)
     ? mf.ingredients
-    : (parseIngredientsFromDescription(descriptionRaw) ?? "");
+    : (parseIngredientsFromDescription(node.description ?? "") ?? parseIngredientsFromDescription(descriptionRaw) ?? "");
 
   const rawIng = getCleanIngredients(node.handle, baseIng, displayTitle, locale);
 
