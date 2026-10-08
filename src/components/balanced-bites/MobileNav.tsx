@@ -9,13 +9,13 @@ import { useCartDrawer } from "./CartDrawer";
 import type { SiteNavActive } from "./SiteHeader";
 import { useMobileMenu } from "./MobileMenuContext";
 
-const NAV_ITEMS: { href: string; label: string; key: SiteNavActive }[] = [
-  { href: "/", label: "Home", key: "home" },
-  { href: "/menu", label: "Menu", key: "menu" },
-  { href: "/my-plan", label: "My Plan", key: "my-plan" },
-  { href: "/about", label: "About", key: "about" },
-  { href: "/account", label: "Account", key: "account" },
-  { href: "/contact", label: "Contact", key: "contact" },
+const NAV_ITEMS: { href: string; key: SiteNavActive }[] = [
+  { href: "/", key: "home" },
+  { href: "/menu", key: "menu" },
+  { href: "/my-plan", key: "my-plan" },
+  { href: "/about", key: "about" },
+  { href: "/account", key: "account" },
+  { href: "/contact", key: "contact" },
 ];
 
 /** Stacking: dim layer below header & sidebar; sidebar above scrim. Portaled to body. */
@@ -68,6 +68,7 @@ export function MobileNav({ active, orderNowHref, locale }: Props) {
         />
 
         <aside
+          dir={locale === "ar" ? "rtl" : "ltr"}
           className={`fixed right-0 top-0 flex h-[100dvh] w-[min(84vw,320px)] max-w-[100vw] flex-col bg-[#f4f1eb] pb-[env(safe-area-inset-bottom)] shadow-[-16px_0_48px_-12px_rgba(66,98,55,0.35)] ring-1 ring-[#426237]/10 transition-transform duration-[260ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform motion-reduce:transition-none lg:hidden ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
@@ -79,7 +80,7 @@ export function MobileNav({ active, orderNowHref, locale }: Props) {
             <button
               type="button"
               onClick={close}
-              aria-label="Close menu"
+              aria-label={t.nav.closeMenu}
               className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 ring-1 ring-[#426237]/12 transition-[background-color,transform] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white active:scale-[0.97]"
             >
               <svg
@@ -101,12 +102,11 @@ export function MobileNav({ active, orderNowHref, locale }: Props) {
 
           <nav
             className="mt-3 flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 pb-4"
-            aria-label="Mobile navigation"
+            aria-label={t.nav.mobileNavigation}
           >
             {NAV_ITEMS.map((item, i) => {
               const isActive = active === item.key;
-              const label =
-                item.key === "my-plan" ? t.nav.myPlan : t.nav[item.key];
+              const label = item.key === "my-plan" ? t.nav.myPlan : t.nav[item.key];
               return (
                 <Link
                   key={item.key}
@@ -160,7 +160,7 @@ export function MobileNav({ active, orderNowHref, locale }: Props) {
           setOpen(next);
         }}
         aria-expanded={open}
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
         className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/85 ring-1 ring-[#426237]/12 transition-[background-color,transform] duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-white active:scale-[0.97] sm:h-11 sm:w-11 lg:hidden"
       >
         <div className="flex w-[19px] flex-col items-center gap-[5px]">

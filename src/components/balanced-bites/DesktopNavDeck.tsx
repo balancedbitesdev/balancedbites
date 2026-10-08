@@ -6,13 +6,13 @@ import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import type { SiteNavActive } from "./SiteHeader";
 
-const ITEMS: { href: string; key: SiteNavActive; label: string }[] = [
-  { href: "/", key: "home", label: "Home" },
-  { href: "/menu", key: "menu", label: "Menu" },
-  { href: "/my-plan", key: "my-plan", label: "My Plan" },
-  { href: "/about", key: "about", label: "About" },
-  { href: "/account", key: "account", label: "Account" },
-  { href: "/contact", key: "contact", label: "Contact" },
+const ITEMS: { href: string; key: SiteNavActive }[] = [
+  { href: "/", key: "home" },
+  { href: "/menu", key: "menu" },
+  { href: "/my-plan", key: "my-plan" },
+  { href: "/about", key: "about" },
+  { href: "/account", key: "account" },
+  { href: "/contact", key: "contact" },
 ];
 
 type Pill = { left: number; top: number; width: number; height: number };
@@ -74,6 +74,8 @@ export function DesktopNavDeck({ active, locale }: Props) {
   }, [updatePill, locale]);
 
   const showPill = active != null && pill.width > 0;
+  const navLabel = (key: SiteNavActive) =>
+    key === "my-plan" ? t.nav.myPlan : t.nav[key];
 
   const transition = reduceMotion
     ? { duration: 0.12, ease: "easeOut" as const }
@@ -84,7 +86,7 @@ export function DesktopNavDeck({ active, locale }: Props) {
       ref={navRef}
       dir={locale === "ar" ? "rtl" : "ltr"}
       className="menu-scrollbar relative hidden min-w-0 flex-1 justify-center gap-1 overflow-x-auto overscroll-x-contain px-2 py-2.5 text-[14px] font-medium lg:flex xl:gap-1.5 xl:text-[15px]"
-      aria-label="Primary"
+      aria-label={t.nav.primaryNavigation}
     >
       <motion.div
         aria-hidden
@@ -101,8 +103,6 @@ export function DesktopNavDeck({ active, locale }: Props) {
       />
       {ITEMS.map((item) => {
         const isOn = active === item.key;
-        const label =
-          item.key === "my-plan" ? t.nav.myPlan : t.nav[item.key];
         return (
           <Link
             key={item.key}
@@ -117,7 +117,7 @@ export function DesktopNavDeck({ active, locale }: Props) {
                 : "font-medium text-[#426237]/75 [@media(hover:hover)_and_(pointer:fine)]:hover:text-[#426237]"
             }`}
           >
-            {label}
+            {navLabel(item.key)}
           </Link>
         );
       })}

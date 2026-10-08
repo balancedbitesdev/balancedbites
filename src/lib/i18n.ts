@@ -33,6 +33,10 @@ export const dict = {
       account: "Account",
       contact: "Contact",
       orderNow: "Order Now",
+      primaryNavigation: "Primary navigation",
+      mobileNavigation: "Mobile navigation",
+      openMenu: "Open menu",
+      closeMenu: "Close menu",
     },
     footer: {
       rights: "All rights reserved.",
@@ -259,6 +263,10 @@ export const dict = {
       account: "حسابي",
       contact: "تواصل",
       orderNow: "اطلب دلوقتي",
+      primaryNavigation: "التنقل الرئيسي",
+      mobileNavigation: "قائمة الموبايل",
+      openMenu: "افتح القائمة",
+      closeMenu: "اقفل القائمة",
     },
     footer: {
       rights: "كل الحقوق محفوظة.",

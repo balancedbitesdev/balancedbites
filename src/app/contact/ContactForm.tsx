@@ -11,7 +11,7 @@ const fieldClass =
   "mt-2 w-full rounded-xl border border-[#426237]/15 bg-[#f4f1eb] px-4 py-3 text-sm text-[#426237] outline-none transition-[border-color,box-shadow] duration-150 ease-out focus:border-[#426237]/25 focus:outline-none focus:ring-2 focus:ring-[#426237]/30 focus:ring-offset-1 focus:ring-offset-[#f4f1eb]";
 
 export function ContactForm() {
-  const { dict: t } = useLocale();
+  const { dict: t, locale } = useLocale();
   const [state, formAction, pending] = useActionState(submitContact, initial);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,6 +30,7 @@ export function ContactForm() {
 
   return (
     <form action={formAction} className="mt-8 space-y-4">
+      <input type="hidden" name="locale" value={locale} />
       <div>
         <label htmlFor="name" className="text-sm font-semibold text-[#426237]">
           {t.contact.form.name}
@@ -88,12 +89,28 @@ export function ContactForm() {
         />
       </div>
       {state.message ? (
-        <p
-          className={`rounded-lg px-3 py-2 text-sm ${state.ok ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
+        <div
+          className={`rounded-lg px-3 py-2 text-sm ${
+            state.ok
+              ? "bg-green-50 text-green-800"
+              : state.whatsappUrl
+                ? "bg-amber-50 text-amber-900"
+                : "bg-red-50 text-red-800"
+          }`}
           role="status"
         >
-          {state.message}
-        </p>
+          <p>{state.message}</p>
+          {!state.ok && state.whatsappUrl ? (
+            <a
+              href={state.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-10 items-center justify-center rounded-full bg-[#25D366] px-5 py-2 text-xs font-semibold text-white transition-[background-color,transform] duration-150 ease-out hover:bg-[#1ebe5a] active:scale-[0.98]"
+            >
+              {locale === "ar" ? "افتح واتساب" : "Open WhatsApp"}
+            </a>
+          ) : null}
+        </div>
       ) : null}
       <button
         type="submit"

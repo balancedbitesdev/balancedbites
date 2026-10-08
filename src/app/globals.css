@@ -97,6 +97,15 @@ html[dir="rtl"] .text-right {
   background: rgba(66, 98, 55, 0.2);
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @keyframes bb-toast-in {
   from {
     opacity: 0;

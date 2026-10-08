@@ -12,6 +12,23 @@ export type MenuProductImage = {
   alt: string;
 };
 
+export type MenuProductVariantSerialized = {
+  id: string;
+  title: string;
+  priceLabel: string;
+  pro: string;
+  fat: string;
+  carb: string;
+  cal: string;
+  portionPlain?: string;
+};
+
+export type MenuCategoryChip = {
+  id: string;
+  label: string;
+  count: number;
+};
+
 export type MenuProductSerialized = {
   id: string;
   title: string;
@@ -33,9 +50,16 @@ export type MenuProductSerialized = {
   imageAlt: string;
   /** Short label for the image badge, e.g. DESSERT */
   categoryLabel: string;
-  filterKey: MenuFilterId | "other";
+  filterKey: MenuFilterId | "other" | string;
   pro: string;
   fat: string;
   carb: string;
   cal: string;
+  /** Unified, standardized macro string e.g. "Protein 32g · Carbs 45g · Fat 18g" */
+  unifiedMacros: string;
+  /** Clean numeric calorie amount for sorting or comparisons */
+  caloriesNumber: number | null;
+  /** Size / portion variants parsed from product description or options */
+  sizeVariants: MenuProductVariantSerialized[];
 };
+

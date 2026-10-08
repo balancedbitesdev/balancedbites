@@ -1,10 +1,12 @@
 "use server";
 
 import { Resend } from "resend";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export type ContactState = {
   ok: boolean;
   message: string;
+  whatsappUrl?: string;
 };
 
 function escapeHtml(text: string): string {
@@ -39,6 +41,78 @@ function getResendEnv(): {
   return { apiKey, to, from, missing };
 }
 
+const WHATSAPP_E164 = process.env.NEXT_PUBLIC_WHATSAPP_E164 ?? "201000000000";
+const WHATSAPP_DIGITS = WHATSAPP_E164.replace(/\D/g, "");
+
+function buildWhatsAppUrl({
+  name,
+  email,
+  phone,
+  message,
+  locale,
+}: {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  locale: Locale;
+}): string {
+  const ar = locale === "ar";
+  const lines = [
+    ar
+      ? "أهلاً Balanced Bites! حاولت أبعت رسالة من الموقع. دي تفاصيل الرسالة:"
+      : "Hi Balanced Bites! I tried to send a message from the website. Here are my details:",
+    "",
+    `${ar ? "الاسم" : "Name"}: ${name}`,
+    `${ar ? "الإيميل" : "Email"}: ${email}`,
+    `${ar ? "الموبايل" : "Phone"}: ${phone || "-"}`,
+    "",
+    `${ar ? "الرسالة" : "Message"}:`,
+    message,
+  ];
+
+  return `https://wa.me/${WHATSAPP_DIGITS}?text=${encodeURIComponent(
+    lines.join("\n"),
+  )}`;
+}
+
+function fallbackState({
+  reason,
+  name,
+  email,
+  phone,
+  message,
+  locale,
+}: {
+  reason: "missing-env" | "send-failed";
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  locale: Locale;
+}): ContactState {
+  const whatsappUrl = buildWhatsAppUrl({ name, email, phone, message, locale });
+  const ar = locale === "ar";
+
+  if (reason === "missing-env") {
+    return {
+      ok: false,
+      whatsappUrl,
+      message: ar
+        ? "الإيميل لسه مش متظبط على السيرفر. افتح واتساب والرسالة هتكون جاهزة للإرسال."
+        : "Email is not configured on the server yet. Open WhatsApp and your message will be ready to send.",
+    };
+  }
+
+  return {
+    ok: false,
+    whatsappUrl,
+    message: ar
+      ? "معرفناش نبعت الرسالة بالإيميل دلوقتي. افتح واتساب والرسالة هتكون جاهزة للإرسال."
+      : "We couldn't send this by email right now. Open WhatsApp and your message will be ready to send.",
+  };
+}
+
 export async function submitContact(
   _prev: ContactState | null,
   formData: FormData,
@@ -47,15 +121,28 @@ export async function submitContact(
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
+  const locale = normalizeLocale(String(formData.get("locale") ?? ""));
+  const ar = locale === "ar";
 
   if (name.length < 2) {
-    return { ok: false, message: "Please enter your name." };
+    return {
+      ok: false,
+      message: ar ? "اكتب اسمك من فضلك." : "Please enter your name.",
+    };
   }
   if (email.length < 5 || !email.includes("@")) {
-    return { ok: false, message: "Please enter a valid email." };
+    return {
+      ok: false,
+      message: ar ? "اكتب إيميل صحيح من فضلك." : "Please enter a valid email.",
+    };
   }
   if (message.length < 10) {
-    return { ok: false, message: "Please enter a longer message (at least 10 characters)." };
+    return {
+      ok: false,
+      message: ar
+        ? "اكتب رسالة أطول شوية (على الأقل ١٠ حروف)."
+        : "Please enter a longer message (at least 10 characters).",
+    };
   }
 
   const { apiKey, to, from, missing } = getResendEnv();
@@ -64,13 +151,20 @@ export async function submitContact(
     console.error(
       `[Contact form] Missing Resend env: ${missing.join(", ")}. Add them to .env.local (local) or the host’s env (e.g. Vercel → Settings → Environment Variables), then restart.`,
     );
-    return {
-      ok: false,
-      message:
-        process.env.NODE_ENV === "development"
-          ? `Email not configured yet — add to .env.local: ${missing.join(", ")}. Restart \`next dev\`. (This is not a route bug; the server action has no Resend keys.)`
-          : "We couldn’t send your message right now. Please use WhatsApp above or try again later.",
-    };
+    const state = fallbackState({
+      reason: "missing-env",
+      name,
+      email,
+      phone,
+      message,
+      locale,
+    });
+    return process.env.NODE_ENV === "development"
+      ? {
+          ...state,
+          message: `${state.message} Missing: ${missing.join(", ")}.`,
+        }
+      : state;
   }
 
   const resend = new Resend(apiKey);
@@ -128,11 +222,14 @@ The Balanced Bites team
 
     if (ownerSend.error) {
       console.error("Resend API error (owner):", ownerSend.error);
-      return {
-        ok: false,
-        message:
-          "We couldn’t send your message. Please try again or reach us on WhatsApp above.",
-      };
+      return fallbackState({
+        reason: "send-failed",
+        name,
+        email,
+        phone,
+        message,
+        locale,
+      });
     }
 
     const visitorSend = await resend.emails.send({
@@ -150,16 +247,21 @@ The Balanced Bites team
     }
   } catch (err) {
     console.error("Contact form send failed:", err);
-    return {
-      ok: false,
-      message:
-        "We couldn’t send your message. Please try again or reach us on WhatsApp above.",
-    };
+    return fallbackState({
+      reason: "send-failed",
+      name,
+      email,
+      phone,
+      message,
+      locale,
+    });
   }
 
   return {
     ok: true,
     message:
-      "Thank you! We’ve sent a confirmation to your email — we’ll reply as soon as we can. For the fastest response, you can also reach us on WhatsApp above.",
+      locale === "ar"
+        ? "تمام! بعتنالك تأكيد على الإيميل وهنرد عليك قريب. ولو محتاج رد أسرع كلمنا على واتساب."
+        : "Thank you! We’ve sent a confirmation to your email — we’ll reply as soon as we can. For the fastest response, you can also reach us on WhatsApp above.",
   };
 }

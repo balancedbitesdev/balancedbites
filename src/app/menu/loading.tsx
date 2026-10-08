@@ -29,31 +29,53 @@ export default function MenuLoading() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-          <Skeleton height={96} borderRadius={16} className="mb-8 leading-none" />
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} width={96} height={40} borderRadius={999} className="leading-none" />
+          <Skeleton height={80} borderRadius={16} className="mb-8 leading-none" />
+
+          {/* Centered Search Bar Skeleton */}
+          <div className="mx-auto w-full max-w-xl">
+            <Skeleton height={48} borderRadius={999} className="leading-none" />
+          </div>
+
+          {/* Quick-Search Category Chips Skeleton */}
+          <div className="mt-4 flex items-center justify-start sm:justify-center gap-2 overflow-hidden py-1.5">
+            {[90, 110, 100, 120, 85, 105].map((w, i) => (
+              <Skeleton
+                key={i}
+                width={w}
+                height={38}
+                borderRadius={999}
+                className="shrink-0 leading-none"
+              />
             ))}
           </div>
-          <ul className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+
+          {/* Product Cards Skeleton */}
+          <ul className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <li
                 key={i}
                 className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-[#426237]/8"
               >
-                <Skeleton
-                  height={200}
-                  className="!block w-full leading-none"
-                  borderRadius={0}
-                  containerClassName="block leading-none"
-                />
-                <div className="space-y-3 px-6 py-5">
-                  <Skeleton height={20} width="72%" borderRadius={8} className="leading-none" />
-                  <Skeleton height={14} className="leading-none" borderRadius={6} />
-                  <Skeleton height={14} width="88%" borderRadius={6} className="leading-none" />
-                  <div className="mt-4 flex justify-between gap-4 pt-4">
-                    <Skeleton width={64} height={28} borderRadius={8} className="leading-none" />
-                    <Skeleton width={112} height={44} borderRadius={999} className="leading-none" />
+                <div className="aspect-[4/3] w-full">
+                  <Skeleton
+                    height="100%"
+                    className="!block h-full w-full leading-none"
+                    borderRadius={0}
+                    containerClassName="block h-full leading-none"
+                  />
+                </div>
+                <div className="space-y-3 p-5 sm:p-6">
+                  <Skeleton height={22} width="80%" borderRadius={8} className="leading-none" />
+                  <div className="flex justify-between items-center pt-1">
+                    <Skeleton height={24} width={90} borderRadius={6} className="leading-none" />
+                    <Skeleton height={18} width={70} borderRadius={6} className="leading-none" />
+                  </div>
+                  {/* Nutrition Block Skeleton */}
+                  <Skeleton height={52} borderRadius={12} className="mt-2 leading-none" />
+                  <Skeleton height={14} width="90%" borderRadius={6} className="mt-2 leading-none" />
+                  <div className="mt-5 flex justify-between items-center gap-3 pt-4 border-t border-gray-100">
+                    <Skeleton width={88} height={36} borderRadius={999} className="leading-none" />
+                    <Skeleton width={110} height={44} borderRadius={999} className="leading-none" />
                   </div>
                 </div>
               </li>
