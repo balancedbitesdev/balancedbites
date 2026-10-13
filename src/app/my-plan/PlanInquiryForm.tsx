@@ -15,10 +15,6 @@ import Stepper, { Step } from "@/components/reactbits/Stepper";
 import { localeDir, type Locale } from "@/lib/i18n";
 import { submitPlanInquiry, type PlanInquiryResult } from "./actions";
 
-type Props = {
-  initialTier?: string;
-};
-
 const INITIAL_STATE: PlanInquiryResult = {
   ok: false,
   message: "",
@@ -41,6 +37,9 @@ const FORM_COPY = {
       "Send your details to us on WhatsApp - we'll open the chat pre-filled with everything you just shared.",
     sendWhatsapp: "Send my details on WhatsApp",
     whatsappNote: "Opens WhatsApp with your answers ready to send - no typing needed.",
+    sendFailed: "We couldn't send your request by email right now.",
+    sendFailedBody:
+      "Don't worry - your answers are saved. Tap below to send them to us on WhatsApp instead.",
     backContact: "Back to contact info",
     requestPlan: "Get My Plan",
     step: "Step",
@@ -124,6 +123,9 @@ const FORM_COPY = {
       "ابعت تفاصيلك على واتساب - هنفتحلك الشات وفيه كل اللي كتبته جاهز للإرسال.",
     sendWhatsapp: "ابعت تفاصيلك على واتساب",
     whatsappNote: "واتساب هيفتح بإجاباتك جاهزة - من غير ما تكتب تاني.",
+    sendFailed: "معرفناش نبعت طلبك بالإيميل دلوقتي.",
+    sendFailedBody:
+      "متقلقش - إجاباتك محفوظة. دوس تحت وابعتها لنا على واتساب بدل الإيميل.",
     backContact: "ارجع لمعلومات التواصل",
     requestPlan: "احصل على خطتي",
     step: "خطوة",
@@ -306,11 +308,12 @@ function buildWhatsAppUrl(d: FormValues, locale: Locale): string {
   )}`;
 }
 
-export function PlanInquiryForm({ initialTier }: Props) {
+export function PlanInquiryForm() {
   const { locale } = useLocale();
   const c = FORM_COPY[locale];
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
+  const [lastAttempt, setLastAttempt] = useState<FormValues | null>(null);
   const snapshotRef = useRef<FormValues>(INITIAL_VALUES);
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
@@ -361,6 +364,7 @@ export function PlanInquiryForm({ initialTier }: Props) {
       notes: values.notes.trim(),
     };
     snapshotRef.current = snapshot;
+    setLastAttempt(snapshot);
 
     const fd = new FormData();
     (Object.keys(snapshot) as Array<keyof FormValues>).forEach((k) => {
@@ -373,7 +377,10 @@ export function PlanInquiryForm({ initialTier }: Props) {
   };
 
   if (state.ok) {
-    const whatsappUrl = submitted ? buildWhatsAppUrl(submitted, locale) : null;
+    const dataForWhatsapp = submitted ?? lastAttempt;
+    const whatsappUrl = dataForWhatsapp
+      ? buildWhatsAppUrl(dataForWhatsapp, locale)
+      : null;
     return (
       <div
         ref={resultsRef}
@@ -414,22 +421,7 @@ export function PlanInquiryForm({ initialTier }: Props) {
               <p className="mt-2 text-sm leading-relaxed text-gray-600">
                 {c.fasterBody}
               </p>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-[background-color,transform] duration-150 ease-out hover:bg-[#1ebe5a] active:scale-[0.98]"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden
-                  className="h-4 w-4"
-                  fill="currentColor"
-                >
-                  <path d="M19.05 4.91A10 10 0 0 0 2.1 17l-1.1 4 4.1-1.07A10 10 0 1 0 19.05 4.9Zm-7 15.18a8.3 8.3 0 0 1-4.24-1.16l-.3-.18-2.43.64.65-2.37-.2-.31a8.31 8.31 0 1 1 15.4-4.36 8.3 8.3 0 0 1-8.88 7.74Zm4.78-6.23c-.26-.13-1.55-.77-1.8-.86-.24-.09-.42-.13-.6.13-.18.26-.67.86-.83 1.04-.15.18-.3.2-.57.07-.26-.13-1.11-.41-2.11-1.3a7.9 7.9 0 0 1-1.47-1.83c-.15-.26-.02-.4.11-.53.12-.12.26-.3.38-.45.13-.15.17-.26.26-.43.09-.18.04-.33-.02-.46-.06-.13-.57-1.38-.78-1.9-.2-.49-.4-.42-.57-.43h-.49c-.17 0-.46.07-.7.33-.24.26-.93.91-.93 2.21 0 1.3.95 2.55 1.08 2.73.13.17 1.86 2.86 4.5 4 .63.27 1.12.43 1.5.55.63.2 1.2.17 1.65.1.5-.07 1.55-.63 1.76-1.24.22-.62.22-1.15.15-1.26-.06-.1-.24-.16-.5-.29Z" />
-                </svg>
-                {c.sendWhatsapp}
-              </a>
+              <WhatsAppButton href={whatsappUrl} label={c.sendWhatsapp} />
               <p className="mt-3 text-[11px] text-gray-500">
                 {c.whatsappNote}
               </p>
@@ -786,7 +778,19 @@ export function PlanInquiryForm({ initialTier }: Props) {
             subtitle={c.step7Sub}
           />
           <div className="mt-6 min-w-0 space-y-4">
-            {!state.ok && state.message ? (
+            {!state.ok && state.whatsappFallback && lastAttempt ? (
+              <div className="rounded-xl border border-amber-500/25 bg-amber-50 p-4 text-sm text-amber-900">
+                <p className="font-semibold">{c.sendFailed}</p>
+                <p className="mt-1 leading-relaxed">{c.sendFailedBody}</p>
+                {process.env.NODE_ENV === "development" ? (
+                  <p className="mt-2 text-xs text-amber-700">{state.message}</p>
+                ) : null}
+                <WhatsAppButton
+                  href={buildWhatsAppUrl(lastAttempt, locale)}
+                  label={c.sendWhatsapp}
+                />
+              </div>
+            ) : !state.ok && state.message ? (
               <div className="rounded-xl border border-red-500/20 bg-red-50 p-4 text-sm text-red-700">
                 {state.message}
               </div>
@@ -805,6 +809,22 @@ export function PlanInquiryForm({ initialTier }: Props) {
         </Step>
       </Stepper>
     </div>
+  );
+}
+
+function WhatsAppButton({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-[background-color,transform] duration-150 ease-out hover:bg-[#1ebe5a] active:scale-[0.98]"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4" fill="currentColor">
+        <path d="M19.05 4.91A10 10 0 0 0 2.1 17l-1.1 4 4.1-1.07A10 10 0 1 0 19.05 4.9Zm-7 15.18a8.3 8.3 0 0 1-4.24-1.16l-.3-.18-2.43.64.65-2.37-.2-.31a8.31 8.31 0 1 1 15.4-4.36 8.3 8.3 0 0 1-8.88 7.74Zm4.78-6.23c-.26-.13-1.55-.77-1.8-.86-.24-.09-.42-.13-.6.13-.18.26-.67.86-.83 1.04-.15.18-.3.2-.57.07-.26-.13-1.11-.41-2.11-1.3a7.9 7.9 0 0 1-1.47-1.83c-.15-.26-.02-.4.11-.53.12-.12.26-.3.38-.45.13-.15.17-.26.26-.43.09-.18.04-.33-.02-.46-.06-.13-.57-1.38-.78-1.9-.2-.49-.4-.42-.57-.43h-.49c-.17 0-.46.07-.7.33-.24.26-.93.91-.93 2.21 0 1.3.95 2.55 1.08 2.73.13.17 1.86 2.86 4.5 4 .63.27 1.12.43 1.5.55.63.2 1.2.17 1.65.1.5-.07 1.55-.63 1.76-1.24.22-.62.22-1.15.15-1.26-.06-.1-.24-.16-.5-.29Z" />
+      </svg>
+      {label}
+    </a>
   );
 }
 

@@ -5,6 +5,8 @@ import { Resend } from "resend";
 export type PlanInquiryResult = {
   ok: boolean;
   message: string;
+  /** True when the email could not be delivered — client should offer WhatsApp. */
+  whatsappFallback?: boolean;
 };
 
 function escapeHtml(text: string): string {
@@ -169,6 +171,7 @@ export async function submitPlanInquiry(
     );
     return {
       ok: false,
+      whatsappFallback: true,
       message:
         process.env.NODE_ENV === "development"
           ? `Email not configured yet — add to .env.local: ${missing.join(", ")}.`
@@ -191,6 +194,7 @@ export async function submitPlanInquiry(
       console.error("Resend API error (plan inquiry owner):", ownerSend.error);
       return {
         ok: false,
+        whatsappFallback: true,
         message:
           "We couldn't send your request. Please try again or reach us on WhatsApp.",
       };
@@ -219,6 +223,7 @@ export async function submitPlanInquiry(
     console.error("Plan inquiry send failed:", err);
     return {
       ok: false,
+      whatsappFallback: true,
       message:
         "We couldn't send your request. Please try again or reach us on WhatsApp.",
     };
