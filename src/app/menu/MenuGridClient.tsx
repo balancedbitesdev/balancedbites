@@ -131,7 +131,8 @@ export function MenuGridClient({ products, categories, locale }: Props) {
       notes,
       selectedVariant,
     }: AddToCartArgs) => {
-      if (product.variantId == null) return false;
+      const targetVariantId = selectedVariant?.variantId || product.variantId;
+      if (targetVariantId == null) return false;
       setAddingId(product.id);
       try {
         const attributes: { key: string; value: string }[] = [];
@@ -160,7 +161,7 @@ export function MenuGridClient({ products, categories, locale }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "add",
-            merchandiseId: product.variantId,
+            merchandiseId: targetVariantId,
             quantity,
             ...(attributes.length > 0 ? { attributes } : {}),
           }),
@@ -170,7 +171,8 @@ export function MenuGridClient({ products, categories, locale }: Props) {
           throw new Error(j.error ?? "Could not add to cart");
         }
         dispatchCartUpdated({ added: { title: product.title } });
-        showToast(`${t.menu.addedToCart}: ${product.title}`);
+        const sizeSuffix = selectedVariant ? ` (${selectedVariant.title})` : "";
+        showToast(`${t.menu.addedToCart}: ${product.title}${sizeSuffix}`);
         return true;
       } catch (e) {
         console.error(e);

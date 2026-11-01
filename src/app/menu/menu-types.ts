@@ -21,6 +21,7 @@ export type MenuProductVariantSerialized = {
   carb: string;
   cal: string;
   portionPlain?: string;
+  variantId?: string | null;
 };
 
 export type MenuCategoryChip = {
