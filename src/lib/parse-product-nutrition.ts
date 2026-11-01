@@ -569,20 +569,20 @@ export function normalizeCategory(
     return CANONICAL_CATEGORIES.veggie_sides;
   }
 
-  // 2. Veggie sides / sauteed vegetables / hummus / tahini
+  // 2. Salads (including salads, rocca, caesar, cabbage, taco salad, tahini, beetroot / betroot / بنجر / طحينة)
   if (
-    /(?:veggie|vegetable|side|hummus|tahini|خضار|جانبي|سوتيه)/i.test(raw) ||
-    /\b(seasonal\s*veg|saut[eé]ed|vegetables?|veggies?|hummus|tahini)\b/i.test(combinedContext)
-  ) {
-    return CANONICAL_CATEGORIES.veggie_sides;
-  }
-
-  // 3. Salads
-  if (
-    /(?:salad|سلطة|سلطات)/i.test(raw) ||
-    /\b(salad|rocca|caesar|cabbage|taco\s*salad)\b/i.test(combinedContext)
+    /(?:salad|سلطة|سلطات|tahini|طحينة|beetroot|betroot|بنجر)/i.test(raw) ||
+    /\b(salad|rocca|caesar|cabbage|taco\s*salad|tahini|beetroot|betroot|beet|بنجر|طحينة)\b/i.test(combinedContext)
   ) {
     return CANONICAL_CATEGORIES.salads;
+  }
+
+  // 3. Veggie sides / sauteed vegetables / hummus
+  if (
+    /(?:veggie|vegetable|side|خضار|جانبي|سوتيه)/i.test(raw) ||
+    /\b(seasonal\s*veg|saut[eé]ed|vegetables?|veggies?|hummus)\b/i.test(combinedContext)
+  ) {
+    return CANONICAL_CATEGORIES.veggie_sides;
   }
 
   // 4. Meats, poultry, seafood, and savory dishes are definitively High Protein meals (never desserts)

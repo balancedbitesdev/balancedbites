@@ -87,6 +87,30 @@ describe("parseCategoryFromDescription & normalizeCategory", () => {
     expect(parseCategoryFromDescription(text)).toBe("salads");
   });
 
+  it("normalizes Tahini and Beetroot items into salads", () => {
+    const tahiniCat = normalizeCategory(null, {
+      title: "Creamy Tahini with Sumac",
+      handle: "creamy-tahini-with-sumac",
+      productType: "Side Dish",
+    });
+    expect(tahiniCat.id).toBe("salads");
+    expect(tahiniCat.labelEn).toBe("Salads");
+
+    const beetrootCat = normalizeCategory(null, {
+      title: "Creamy Beetroot Hummus with Tahini",
+      handle: "creamy-beetroot-hummus-tahini",
+      productType: "Side Dish",
+      tags: ["dip", "hummus", "side"],
+    });
+    expect(beetrootCat.id).toBe("salads");
+
+    const betrootArabicCat = normalizeCategory("سلطات", {
+      title: "سلطة بنجر",
+      handle: "beetroot-salad",
+    });
+    expect(betrootArabicCat.id).toBe("salads");
+  });
+
   it("normalizes Cottage Cheese correctly into veggie_sides", () => {
     const cat = normalizeCategory("Meal & High Protein", {
       title: "Cottage Cheese with Red Pepper & Parsley 250gm",
