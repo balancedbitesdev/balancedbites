@@ -170,6 +170,9 @@ export async function submitContact(
   const resend = new Resend(apiKey);
 
   const phoneLine = phone.length > 0 ? phone : "(not provided)";
+  const phoneDisplay =
+    phone.length > 0 ? phone : ar ? "غير محدد" : "(not provided)";
+
   const textBody = [
     `Name: ${name}`,
     `Email: ${email}`,
@@ -187,26 +190,91 @@ export async function submitContact(
     <p style="white-space:pre-wrap;font-family:system-ui,sans-serif">${escapeHtml(message)}</p>
   `;
 
-  const visitorSubject = "We received your message — Balanced Bites";
-  const visitorText = `Hi ${name},
+  const visitorSubject = ar
+    ? "استلمنا رسالتك — Balanced Bites"
+    : "We received your message — Balanced Bites";
 
-Thanks for getting in touch with Balanced Bites.
+  const visitorText = ar
+    ? `أهلاً ${name}،
 
-We've received your message and will respond as soon as we can. We appreciate your patience.
+شكراً لتواصلك مع Balanced Bites. استلمنا رسالتك وهنرد عليك في أقرب وقت ممكن.
 
-If something is urgent, you're always welcome to message us on WhatsApp for a quicker chat.
+فيما يلي البيانات التي قمت بإرسالها للتأكيد والمراجعة:
+- الاسم: ${name}
+- الإيميل: ${email}
+- الموبايل: ${phoneDisplay}
+- الرسالة:
+${message}
+
+لو في أي تعديل على بياناتك أو استفسار عاجل، تقدر ترد مباشرة على الإيميل ده أو تكلمنا على واتساب.
+
+مع أطيب التحيات،
+فريق Balanced Bites
+`
+    : `Hi ${name},
+
+Thanks for getting in touch with Balanced Bites. We've received your message and will respond as soon as we can.
+
+Here is a copy of your submitted details for your reference:
+- Name: ${name}
+- Email: ${email}
+- Phone: ${phoneDisplay}
+- Message:
+${message}
+
+If anything needs updating or if your inquiry is urgent, feel free to reply directly to this email or message us on WhatsApp.
 
 Warmly,
 The Balanced Bites team
 `;
 
+  const summaryHeader = ar
+    ? "البيانات المسجلة للمراجعة"
+    : "Your submitted details";
+  const nameLabel = ar ? "الاسم" : "Name";
+  const emailLabel = ar ? "الإيميل" : "Email";
+  const phoneLabel = ar ? "الموبايل" : "Phone";
+  const messageLabel = ar ? "الرسالة" : "Message";
+
   const visitorHtml = `
-    <div style="font-family:system-ui,-apple-system,sans-serif;line-height:1.6;color:#333;max-width:32rem">
-      <p>Hi ${escapeHtml(name)},</p>
-      <p>Thanks for getting in touch with <strong style="color:#426237">Balanced Bites</strong>.</p>
-      <p>We've received your message and will respond as soon as we can. We appreciate your patience.</p>
-      <p>If something is urgent, you're always welcome to message us on <strong>WhatsApp</strong> for a quicker chat.</p>
-      <p style="margin-top:1.75rem;color:#426237">Warmly,<br />The Balanced Bites team</p>
+    <div style="font-family:system-ui,-apple-system,sans-serif;line-height:1.6;color:#1f2937;max-width:34rem;direction:${ar ? "rtl" : "ltr"}">
+      <p style="margin:0 0 12px">${ar ? `أهلاً ${escapeHtml(name)}،` : `Hi ${escapeHtml(name)},`}</p>
+      <p style="margin:0 0 16px">${
+        ar
+          ? `شكراً لتواصلك مع <strong style="color:#426237">Balanced Bites</strong>. استلمنا رسالتك وهنرد عليك في أقرب وقت ممكن.`
+          : `Thanks for getting in touch with <strong style="color:#426237">Balanced Bites</strong>. We've received your message and will respond as soon as we can.`
+      }</p>
+
+      <div style="margin:20px 0;padding:16px;background-color:#f4f1eb;border-radius:12px;border:1px solid rgba(66,98,55,0.15)">
+        <p style="margin:0 0 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#ac8058">${summaryHeader}</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;line-height:1.5;margin:0">
+          <tbody>
+            <tr>
+              <td style="padding:6px 8px;color:#6b5b4d;font-weight:600;width:28%;vertical-align:top;border-bottom:1px solid rgba(66,98,55,0.08)">${nameLabel}</td>
+              <td style="padding:6px 8px;color:#1f2937;border-bottom:1px solid rgba(66,98,55,0.08)">${escapeHtml(name)}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;color:#6b5b4d;font-weight:600;vertical-align:top;border-bottom:1px solid rgba(66,98,55,0.08)">${emailLabel}</td>
+              <td style="padding:6px 8px;color:#1f2937;border-bottom:1px solid rgba(66,98,55,0.08)"><a href="mailto:${escapeHtml(email)}" style="color:#426237;text-decoration:none">${escapeHtml(email)}</a></td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;color:#6b5b4d;font-weight:600;vertical-align:top;border-bottom:1px solid rgba(66,98,55,0.08)">${phoneLabel}</td>
+              <td style="padding:6px 8px;color:#1f2937;border-bottom:1px solid rgba(66,98,55,0.08)">${escapeHtml(phoneDisplay)}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 8px;color:#6b5b4d;font-weight:600;vertical-align:top">${messageLabel}</td>
+              <td style="padding:6px 8px;color:#1f2937;white-space:pre-wrap">${escapeHtml(message)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin:16px 0 0;font-size:13px;color:#6b7280">${
+        ar
+          ? "لو في أي تعديل على بياناتك أو استفسار عاجل، تقدر ترد مباشرة على الإيميل ده أو تكلمنا على <strong>واتساب</strong>."
+          : "If anything needs updating or if your inquiry is urgent, feel free to reply directly to this email or message us on <strong>WhatsApp</strong>."
+      }</p>
+      <p style="margin-top:24px;color:#426237">${ar ? "مع أطيب التحيات،<br />فريق Balanced Bites" : "Warmly,<br />The Balanced Bites team"}</p>
     </div>
   `;
 

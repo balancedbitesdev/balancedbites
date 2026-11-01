@@ -18,6 +18,7 @@ interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   initialStep?: number;
   onStepChange?: (step: number) => void;
+  onBeforeStepChange?: (fromStep: number, toStep: number) => boolean;
   onFinalStepCompleted?: () => void;
   stepCircleContainerClassName?: string;
   stepContainerClassName?: string;
@@ -42,6 +43,7 @@ export default function Stepper({
   children,
   initialStep = 1,
   onStepChange = () => {},
+  onBeforeStepChange,
   onFinalStepCompleted = () => {},
   stepCircleContainerClassName = "",
   stepContainerClassName = "",
@@ -81,6 +83,9 @@ export default function Stepper({
   };
 
   const handleNext = () => {
+    if (onBeforeStepChange && !onBeforeStepChange(currentStep, currentStep + 1)) {
+      return;
+    }
     if (!isLastStep) {
       setDirection(1);
       updateStep(currentStep + 1);
@@ -88,8 +93,22 @@ export default function Stepper({
   };
 
   const handleComplete = () => {
+    if (onBeforeStepChange && !onBeforeStepChange(currentStep, totalSteps + 1)) {
+      return;
+    }
     setDirection(1);
     updateStep(totalSteps + 1);
+  };
+
+  const handleStepIndicatorClick = (stepNumber: number) => {
+    if (stepNumber === currentStep) return;
+    if (stepNumber > currentStep) {
+      if (onBeforeStepChange && !onBeforeStepChange(currentStep, stepNumber)) {
+        return;
+      }
+    }
+    setDirection(stepNumber > currentStep ? 1 : -1);
+    updateStep(stepNumber);
   };
 
   return (
@@ -111,8 +130,7 @@ export default function Stepper({
                       step: stepNumber,
                       currentStep,
                       onStepClick: (clicked) => {
-                        setDirection(clicked > currentStep ? 1 : -1);
-                        updateStep(clicked);
+                        handleStepIndicatorClick(clicked);
                       },
                     })
                   ) : (
@@ -121,8 +139,7 @@ export default function Stepper({
                       disableStepIndicators={disableStepIndicators}
                       currentStep={currentStep}
                       onClickStep={(clicked) => {
-                        setDirection(clicked > currentStep ? 1 : -1);
-                        updateStep(clicked);
+                        handleStepIndicatorClick(clicked);
                       }}
                     />
                   )}

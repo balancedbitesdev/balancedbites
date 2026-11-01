@@ -64,6 +64,11 @@ describe("parsePortionFromDescription", () => {
     const raw = "Ingredients: Almond flour\nPortion: 250g Jar\nNutrition: 200 kcal";
     expect(parsePortionFromDescription(raw)).toBe("250g Jar");
   });
+
+  it("does not parse stray macro numbers like 3gm or 5g as portion size", () => {
+    const raw = "Ingredients: Strawberry, Whey Protein\nNet Carbs: 3gm | Sugar: 2g\nNutrition: 218 kcal";
+    expect(parsePortionFromDescription(raw)).toBeNull();
+  });
 });
 
 describe("parseCategoryFromDescription & normalizeCategory", () => {

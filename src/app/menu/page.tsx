@@ -872,35 +872,31 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
 
   let portionPlain = PORTION_OVERRIDE[node.handle]?.[locale];
   if (!portionPlain) {
-    portionPlain = mf.portion || parsePortionFromDescription(descriptionRaw) || "";
-    if (portionPlain && locale === "ar") {
-      portionPlain = translateMenuTextToArabic(portionPlain);
-    }
-  }
-  if (!portionPlain) {
-    if (node.handle.includes("cottage-cheese") || node.handle.includes("protein-jar")) {
-      portionPlain = locale === "ar" ? "برطمان واحد (٢٥٠ جم)" : "1 Jar (250g)";
-    } else if (filterKey === "keto_desserts") {
-      portionPlain = locale === "ar" ? "قطعة / وجبة واحدة" : "1 Serving";
-    } else if (filterKey === "frozen") {
-      portionPlain = locale === "ar" ? "عبوة فروزن" : "1 Frozen Pack";
-    } else {
-      portionPlain = locale === "ar" ? "وجبة واحدة كاملا (~٣٠٠ جم)" : "1 Full Meal Portion (~300g)";
+    const parsed =
+      mf.portion || parsePortionFromDescription(descriptionRaw) || "";
+    if (parsed) {
+      const lower = parsed.trim().toLowerCase();
+      const isGeneric =
+        lower === "1 serving" ||
+        lower === "serving" ||
+        lower === "per serving" ||
+        lower === "per portion" ||
+        lower === "per piece" ||
+        lower === "وجبة واحدة" ||
+        lower === "قطعة واحدة" ||
+        lower === "قطعة / وجبة واحدة" ||
+        lower === "1 full meal portion (~300g)" ||
+        lower === "1 frozen pack" ||
+        /^\d+(?:\.\d+)?\s*(?:g|gm)$/i.test(lower);
+
+      if (!isGeneric) {
+        portionPlain =
+          locale === "ar" ? translateMenuTextToArabic(parsed) : parsed;
+      }
     }
   }
 
-  let servingNote = SERVING_NOTE_OVERRIDE[node.handle]?.[locale];
-  if (!servingNote) {
-    if (node.handle.includes("cottage-cheese") || node.handle.includes("protein-jar")) {
-      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للبرطمان بالكامل" : "Price & macros for full 250g jar";
-    } else if (filterKey === "keto_desserts") {
-      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للقطعة الواحدة" : "Price & macros per serving/piece";
-    } else if (filterKey === "frozen") {
-      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للكيس الفروزن بالكامل" : "Price & macros for full frozen pack";
-    } else {
-      servingNote = locale === "ar" ? "السعر والقيمة الغذائية للوجبة بالكامل" : "Price & macros per full meal portion";
-    }
-  }
+  const servingNote = SERVING_NOTE_OVERRIDE[node.handle]?.[locale] || "";
 
   const fb = FALLBACK_NUTRITION[node.handle];
   const rawVariants = parseSizeVariantsFromDescription(node.description ?? "");

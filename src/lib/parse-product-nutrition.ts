@@ -267,22 +267,30 @@ export function parsePortionFromDescription(text: string): string | null {
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/gi, " ");
 
+  // 1. Explicit "Portion:" or "Serving Size:" header
   const m = normalized.match(
-    /Portion\s*[:\-]?\s*([\s\S]+?)(?=(?:Ingredients|Ingredient|المكونات|Nutrition|Protein|Pro|Carbs|Fat|Calories|Cal|Energy|💪|🍞|🧈|🔥|📊|<|\n|$))/i
+    /(?:Portion|Serving(?:\s+size)?)\s*[:\-]?\s*([\s\S]+?)(?=(?:Ingredients|Ingredient|المكونات|Nutrition|Protein|Pro|Carbs|Fat|Calories|Cal|Energy|💪|🍞|🧈|🔥|📊|<|\n|$))/i
   );
   if (m && m[1]) {
     const cleaned = cleanUnicodeAndStraySymbols(m[1]);
-    if (cleaned.length > 0) return cleaned;
+    // Reject stray macro values like "3g" or "3gm"
+    if (cleaned.length > 0 && !/^\d+(?:\.\d+)?\s*(?:g|gm)$/i.test(cleaned)) {
+      return cleaned;
+    }
   }
-  const mSet = normalized.match(/(?:Pack|Set|Box)\s*[:\-]?\s*((?:Set|Pack|Box)\s+of\s+[^,.\n<]+|\d+\s*(?:pieces?|pcs?|muffins?|cookies?|truffles?|slices?)[^,.\n<]*)/i);
-  if (mSet && mSet[1]) {
-    const cleaned = cleanUnicodeAndStraySymbols(mSet[1]);
-    if (cleaned.length > 0) return cleaned;
+
+  // 2. Explicit Pack / Set / Box declaration (e.g. "Box of 5 Truffles", "Set of 6 Muffins", "Pack of 2 Cookies")
+  const mSet = normalized.match(
+    /(?:(?:Set|Pack|Box)\s+of\s+\d+[^,.\n<]*|(?:Pack|Set|Box)\s*[:\-]\s*(?:Set|Pack|Box|\d+)[^,.\n<]*)/i
+  );
+  if (mSet && (mSet[1] || mSet[0])) {
+    const rawMatch = mSet[1] || mSet[0];
+    const cleaned = cleanUnicodeAndStraySymbols(rawMatch);
+    if (cleaned.length > 0 && !/^\d+(?:\.\d+)?\s*(?:g|gm)$/i.test(cleaned)) {
+      return cleaned;
+    }
   }
-  const m2 = normalized.match(/(?:Per\s+Jar|Per\s+Portion|Per\s+Bowl|Per\s+Piece|Per\s+Pack|\d+\s*(?:g|gm)\b)/i);
-  if (m2 && m2[0]) {
-    return cleanUnicodeAndStraySymbols(m2[0]);
-  }
+
   return null;
 }
 

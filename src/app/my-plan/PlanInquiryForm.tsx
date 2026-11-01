@@ -23,10 +23,15 @@ const INITIAL_STATE: PlanInquiryResult = {
 const WHATSAPP_E164 = process.env.NEXT_PUBLIC_WHATSAPP_E164 ?? "201000000000";
 const WHATSAPP_DIGITS = WHATSAPP_E164.replace(/\D/g, "");
 
-const FIELD_CLASS =
-  "box-border mt-2 min-h-11 min-w-0 max-w-full w-full rounded-xl border border-[#426237]/15 bg-[#f4f1eb] px-4 py-3 text-sm text-[#426237] outline-none transition-[border-color,box-shadow] duration-150 ease-out focus:border-[#426237]/25 focus:ring-2 focus:ring-[#426237]/30";
+const baseFieldClass =
+  "box-border mt-2 min-h-11 min-w-0 max-w-full w-full rounded-xl border px-4 py-3 text-sm text-[#426237] outline-none transition-[border-color,box-shadow] duration-150 ease-out";
 
-const FIELD_LTR_CLASS = `${FIELD_CLASS} text-start`;
+const getFieldClass = (hasError?: boolean, ltr?: boolean) =>
+  `${baseFieldClass} ${
+    hasError
+      ? "border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-2 focus:ring-red-200"
+      : "border-[#426237]/15 bg-[#f4f1eb] focus:border-[#426237]/25 focus:ring-2 focus:ring-[#426237]/30"
+  } ${ltr ? "text-start" : ""}`;
 
 const FORM_COPY = {
   en: {
@@ -114,6 +119,23 @@ const FORM_COPY = {
     step7Sub: "Anything else our nutritionist should know before building your plan.",
     notes: "Anything else we should know?",
     notesPlaceholder: "Sleep schedule, stress levels, training times, preferred start date...",
+
+    errors: {
+      fullName: "Please enter your full name (at least 2 characters).",
+      age: "Please enter your age (12–110).",
+      gender: "Please select your gender.",
+      email: "Please enter a valid email address.",
+      phone: "Please enter your phone number.",
+      weightKg: "Please enter your weight in kg.",
+      heightCm: "Please enter your height in cm.",
+      activityLevel: "Please select your activity level.",
+      workType: "Please select your work type.",
+      goal: "Please select your main goal.",
+      dietPreference: "Please select your diet preference.",
+      mealsPerDay: "Please select your meals per day.",
+      sugarCravings: "Please answer this question.",
+      lateNightEating: "Please answer this question.",
+    },
   },
   ar: {
     thanks: "شكرًا إنك تواصلت معانا",
@@ -200,6 +222,23 @@ const FORM_COPY = {
     step7Sub: "أي معلومات تانية تحب أخصائية التغذية تعرفها قبل تصميم الخطة.",
     notes: "أي شيء آخر يجب أن نعرفه؟",
     notesPlaceholder: "مواعيد نومك، مستوى التوتر، أوقات التمرين، ميعاد البداية المفضل...",
+
+    errors: {
+      fullName: "اكتب اسمك بالكامل من فضلك (حرفين على الأقل).",
+      age: "اكتب سنك من فضلك (١٢ - ١١٠).",
+      gender: "اختر النوع من فضلك.",
+      email: "اكتب إيميل صحيح من فضلك.",
+      phone: "اكتب رقم الموبايل من فضلك.",
+      weightKg: "اكتب وزنك بالكيلو جرام.",
+      heightCm: "اكتب طولك بالسنتيمتر.",
+      activityLevel: "اختر مستوى نشاطك الحركي.",
+      workType: "اختر نوع عملك.",
+      goal: "اختر هدفك الأساسي من الخطة.",
+      dietPreference: "اختر نظامك الغذائي المفضل.",
+      mealsPerDay: "اختر عدد الوجبات اليومية.",
+      sugarCravings: "جاوب على هذا السؤال من فضلك.",
+      lateNightEating: "جاوب على هذا السؤال من فضلك.",
+    },
   },
 } as const;
 
@@ -308,10 +347,90 @@ function buildWhatsAppUrl(d: FormValues, locale: Locale): string {
   )}`;
 }
 
+type ErrorKey = keyof (typeof FORM_COPY)["en"]["errors"];
+type ErrorCopy = Record<ErrorKey, string>;
+
+function validateStep(
+  step: number,
+  values: FormValues,
+  errCopy: ErrorCopy,
+): Record<string, string> {
+  const errs: Record<string, string> = {};
+
+  if (step === 1) {
+    if (values.fullName.trim().length < 2) {
+      errs.fullName = errCopy.fullName;
+    }
+    const ageNum = Number(values.age.trim());
+    if (!values.age.trim() || isNaN(ageNum) || ageNum < 12 || ageNum > 110) {
+      errs.age = errCopy.age;
+    }
+    if (!values.gender.trim()) {
+      errs.gender = errCopy.gender;
+    }
+    if (
+      values.email.trim().length < 5 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())
+    ) {
+      errs.email = errCopy.email;
+    }
+    if (values.phone.trim().replace(/\D/g, "").length < 7) {
+      errs.phone = errCopy.phone;
+    }
+  }
+
+  if (step === 2) {
+    const w = Number(values.weightKg.trim());
+    if (!values.weightKg.trim() || isNaN(w) || w < 25 || w > 300) {
+      errs.weightKg = errCopy.weightKg;
+    }
+    const h = Number(values.heightCm.trim());
+    if (!values.heightCm.trim() || isNaN(h) || h < 100 || h > 250) {
+      errs.heightCm = errCopy.heightCm;
+    }
+  }
+
+  if (step === 3) {
+    if (!values.activityLevel.trim()) {
+      errs.activityLevel = errCopy.activityLevel;
+    }
+    if (!values.workType.trim()) {
+      errs.workType = errCopy.workType;
+    }
+  }
+
+  if (step === 4) {
+    if (!values.goal.trim()) {
+      errs.goal = errCopy.goal;
+    }
+  }
+
+  if (step === 5) {
+    if (!values.dietPreference.trim()) {
+      errs.dietPreference = errCopy.dietPreference;
+    }
+  }
+
+  if (step === 6) {
+    if (!values.mealsPerDay.trim()) {
+      errs.mealsPerDay = errCopy.mealsPerDay;
+    }
+    if (!values.sugarCravings.trim()) {
+      errs.sugarCravings = errCopy.sugarCravings;
+    }
+    if (!values.lateNightEating.trim()) {
+      errs.lateNightEating = errCopy.lateNightEating;
+    }
+  }
+
+  return errs;
+}
+
 export function PlanInquiryForm() {
   const { locale } = useLocale();
   const c = FORM_COPY[locale];
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<FormValues | null>(null);
   const [lastAttempt, setLastAttempt] = useState<FormValues | null>(null);
   const snapshotRef = useRef<FormValues>(INITIAL_VALUES);
@@ -338,9 +457,39 @@ export function PlanInquiryForm() {
       e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
       setValues((v) => ({ ...v, [key]: e.target.value }));
+      if (errors[key]) {
+        setErrors((prev) => {
+          const next = { ...prev };
+          delete next[key];
+          return next;
+        });
+      }
     };
 
+  const handleBeforeStepChange = (fromStep: number, toStep: number): boolean => {
+    if (toStep < fromStep) {
+      return true;
+    }
+
+    for (let s = fromStep; s < toStep; s++) {
+      const stepErrors = validateStep(s, values, c.errors);
+      if (Object.keys(stepErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...stepErrors }));
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const submit = () => {
+    for (let s = 1; s <= 6; s++) {
+      const stepErrors = validateStep(s, values, c.errors);
+      if (Object.keys(stepErrors).length > 0) {
+        setErrors((prev) => ({ ...prev, ...stepErrors }));
+        return;
+      }
+    }
     const snapshot: FormValues = {
       fullName: values.fullName.trim(),
       age: values.age.trim(),
@@ -370,6 +519,7 @@ export function PlanInquiryForm() {
     (Object.keys(snapshot) as Array<keyof FormValues>).forEach((k) => {
       fd.set(k, snapshot[k]);
     });
+    fd.set("locale", locale);
 
     startTransition(() => {
       formAction(fd);
@@ -461,6 +611,7 @@ export function PlanInquiryForm() {
         nextButtonProps={{ disabled: pending, "aria-busy": pending }}
         backButtonProps={{ disabled: pending }}
         disableStepIndicators={pending}
+        onBeforeStepChange={handleBeforeStepChange}
         onFinalStepCompleted={submit}
       >
         {/* Step 1: Personal Information */}
@@ -472,17 +623,17 @@ export function PlanInquiryForm() {
           />
           <div className="mt-6 min-w-0 space-y-4">
             <Row>
-              <Field label={c.fullName} required>
+              <Field label={c.fullName} required error={errors.fullName}>
                 <input
                   type="text"
                   name="fullName"
                   value={values.fullName}
                   onChange={update("fullName")}
                   autoComplete="name"
-                  className={FIELD_CLASS}
+                  className={getFieldClass(Boolean(errors.fullName))}
                 />
               </Field>
-              <Field label={c.age}>
+              <Field label={c.age} required error={errors.age}>
                 <input
                   type="number"
                   name="age"
@@ -492,24 +643,24 @@ export function PlanInquiryForm() {
                   min={12}
                   max={110}
                   placeholder="e.g. 30"
-                  className={FIELD_CLASS}
+                  className={getFieldClass(Boolean(errors.age))}
                 />
               </Field>
             </Row>
             <Row>
-              <Field label={c.gender}>
+              <Field label={c.gender} required error={errors.gender}>
                 <select
                   name="gender"
                   value={values.gender}
                   onChange={update("gender")}
-                  className={FIELD_CLASS}
+                  className={getFieldClass(Boolean(errors.gender))}
                 >
                   <option value="">{c.gender}</option>
                   <option value="female">{c.female}</option>
                   <option value="male">{c.male}</option>
                 </select>
               </Field>
-              <Field label={c.email} required>
+              <Field label={c.email} required error={errors.email}>
                 <input
                   type="email"
                   name="email"
@@ -517,11 +668,11 @@ export function PlanInquiryForm() {
                   onChange={update("email")}
                   autoComplete="email"
                   dir="ltr"
-                  className={FIELD_LTR_CLASS}
+                  className={getFieldClass(Boolean(errors.email), true)}
                 />
               </Field>
             </Row>
-            <Field label={c.phone}>
+            <Field label={c.phone} required error={errors.phone}>
               <input
                 type="tel"
                 name="phone"
@@ -529,7 +680,7 @@ export function PlanInquiryForm() {
                 onChange={update("phone")}
                 autoComplete="tel"
                 dir="ltr"
-                className={FIELD_LTR_CLASS}
+                className={getFieldClass(Boolean(errors.phone), true)}
               />
             </Field>
           </div>
@@ -544,7 +695,7 @@ export function PlanInquiryForm() {
           />
           <div className="mt-6 min-w-0 space-y-4">
             <Row>
-              <Field label={c.weightKg}>
+              <Field label={c.weightKg} required error={errors.weightKg}>
                 <input
                   type="number"
                   name="weightKg"
@@ -555,10 +706,10 @@ export function PlanInquiryForm() {
                   min={30}
                   max={250}
                   placeholder="e.g. 70"
-                  className={FIELD_CLASS}
+                  className={getFieldClass(Boolean(errors.weightKg))}
                 />
               </Field>
-              <Field label={c.heightCm}>
+              <Field label={c.heightCm} required error={errors.heightCm}>
                 <input
                   type="number"
                   name="heightCm"
@@ -569,7 +720,7 @@ export function PlanInquiryForm() {
                   min={120}
                   max={230}
                   placeholder="e.g. 170"
-                  className={FIELD_CLASS}
+                  className={getFieldClass(Boolean(errors.heightCm))}
                 />
               </Field>
             </Row>
@@ -584,7 +735,7 @@ export function PlanInquiryForm() {
                 min={3}
                 max={60}
                 placeholder="e.g. 20"
-                className={FIELD_CLASS}
+                className={getFieldClass(false)}
               />
             </Field>
           </div>
@@ -598,12 +749,12 @@ export function PlanInquiryForm() {
             subtitle={c.step3Sub}
           />
           <div className="mt-6 min-w-0 space-y-4">
-            <Field label={c.activityLevel}>
+            <Field label={c.activityLevel} required error={errors.activityLevel}>
               <select
                 name="activityLevel"
                 value={values.activityLevel}
                 onChange={update("activityLevel")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.activityLevel))}
               >
                 <option value="">{c.activityLevel}</option>
                 <option value="Low">{c.lowActivity}</option>
@@ -611,12 +762,12 @@ export function PlanInquiryForm() {
                 <option value="High">{c.highActivity}</option>
               </select>
             </Field>
-            <Field label={c.workType}>
+            <Field label={c.workType} required error={errors.workType}>
               <select
                 name="workType"
                 value={values.workType}
                 onChange={update("workType")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.workType))}
               >
                 <option value="">{c.workType}</option>
                 <option value="Desk">{c.deskWork}</option>
@@ -635,12 +786,12 @@ export function PlanInquiryForm() {
             subtitle={c.step4Sub}
           />
           <div className="mt-6 min-w-0 space-y-4">
-            <Field label={c.mainGoal}>
+            <Field label={c.mainGoal} required error={errors.goal}>
               <select
                 name="goal"
                 value={values.goal}
                 onChange={update("goal")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.goal))}
               >
                 <option value="">{c.mainGoal}</option>
                 <option value="Fat Loss">{c.fatLoss}</option>
@@ -660,7 +811,7 @@ export function PlanInquiryForm() {
                 min={30}
                 max={250}
                 placeholder="e.g. 65"
-                className={FIELD_CLASS}
+                className={getFieldClass(false)}
               />
             </Field>
           </div>
@@ -681,15 +832,15 @@ export function PlanInquiryForm() {
                 value={values.medicalConditions}
                 onChange={update("medicalConditions")}
                 placeholder={c.medicalPlaceholder}
-                className={FIELD_CLASS}
+                className={getFieldClass(false)}
               />
             </Field>
-            <Field label={c.dietPreference}>
+            <Field label={c.dietPreference} required error={errors.dietPreference}>
               <select
                 name="dietPreference"
                 value={values.dietPreference}
                 onChange={update("dietPreference")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.dietPreference))}
               >
                 <option value="">{c.dietPreference}</option>
                 <option value="Keto">{c.keto}</option>
@@ -705,7 +856,7 @@ export function PlanInquiryForm() {
                 value={values.allergies}
                 onChange={update("allergies")}
                 placeholder={c.allergiesPlaceholder}
-                className={FIELD_CLASS}
+                className={getFieldClass(false)}
               />
             </Field>
             <Field label={c.dislikedFoods}>
@@ -715,7 +866,7 @@ export function PlanInquiryForm() {
                 value={values.dislikedFoods}
                 onChange={update("dislikedFoods")}
                 placeholder={c.dislikedPlaceholder}
-                className={FIELD_CLASS}
+                className={getFieldClass(false)}
               />
             </Field>
           </div>
@@ -729,12 +880,12 @@ export function PlanInquiryForm() {
             subtitle={c.step6Sub}
           />
           <div className="mt-6 min-w-0 space-y-4">
-            <Field label={c.mealsPerDay}>
+            <Field label={c.mealsPerDay} required error={errors.mealsPerDay}>
               <select
                 name="mealsPerDay"
                 value={values.mealsPerDay}
                 onChange={update("mealsPerDay")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.mealsPerDay))}
               >
                 <option value="">{c.mealsPerDay}</option>
                 <option value="2 meals">2 {locale === "ar" ? "وجبات" : "meals"}</option>
@@ -743,24 +894,24 @@ export function PlanInquiryForm() {
                 <option value="5+ meals">5+ {locale === "ar" ? "وجبات" : "meals"}</option>
               </select>
             </Field>
-            <Field label={c.sugarCravings}>
+            <Field label={c.sugarCravings} required error={errors.sugarCravings}>
               <select
                 name="sugarCravings"
                 value={values.sugarCravings}
                 onChange={update("sugarCravings")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.sugarCravings))}
               >
                 <option value="">{c.sugarCravings}</option>
                 <option value="Yes">{c.yes}</option>
                 <option value="No">{c.no}</option>
               </select>
             </Field>
-            <Field label={c.lateNightEating}>
+            <Field label={c.lateNightEating} required error={errors.lateNightEating}>
               <select
                 name="lateNightEating"
                 value={values.lateNightEating}
                 onChange={update("lateNightEating")}
-                className={FIELD_CLASS}
+                className={getFieldClass(Boolean(errors.lateNightEating))}
               >
                 <option value="">{c.lateNightEating}</option>
                 <option value="Yes">{c.yes}</option>
@@ -802,7 +953,7 @@ export function PlanInquiryForm() {
                 value={values.notes}
                 onChange={update("notes")}
                 placeholder={c.notesPlaceholder}
-                className={FIELD_CLASS}
+                className={getFieldClass(false)}
               />
             </Field>
           </div>
@@ -861,10 +1012,12 @@ function Row({ children }: { children: ReactNode }) {
 function Field({
   label,
   required,
+  error,
   children,
 }: {
   label: string;
   required?: boolean;
+  error?: string;
   children: ReactNode;
 }) {
   return (
@@ -874,6 +1027,14 @@ function Field({
         {required ? <span className="ms-1 text-red-500">*</span> : null}
       </span>
       {children}
+      {error ? (
+        <span
+          className="mt-1.5 block text-xs font-normal text-red-600"
+          role="alert"
+        >
+          {error}
+        </span>
+      ) : null}
     </label>
   );
 }
