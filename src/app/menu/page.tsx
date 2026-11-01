@@ -858,7 +858,13 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
     tags: node.tags,
     description: node.description,
   });
+  const isProteinJar = /\bprotein[-_\s]*jars?\b/i.test(
+    `${node.title} ${node.handle} ${(node.tags ?? []).join(" ")} ${node.productType ?? ""}`
+  );
   const filterKey = categoryInfo.id;
+  const filterKeys: string[] = isProteinJar
+    ? ["keto_desserts", "high_protein"]
+    : [categoryInfo.id];
   const categoryLabel = locale === "ar" ? categoryInfo.labelAr : categoryInfo.labelEn.toUpperCase();
 
   const baseIng = (mf.ingredients && mf.ingredients.trim().length > 0)
@@ -970,6 +976,7 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
     imageAlt: image?.alt ?? displayTitle,
     categoryLabel,
     filterKey,
+    filterKeys,
     pro,
     fat,
     carb,
@@ -991,22 +998,24 @@ export default async function MenuPage() {
   // Dynamically extract unique categories present in the products data
   const categoryMap = new Map<string, { id: string; label: string; count: number; order: number }>();
   for (const p of products) {
-    const catId = p.filterKey;
-    if (!categoryMap.has(catId)) {
-      const info = CANONICAL_CATEGORIES[catId] ?? {
-        id: catId,
-        labelEn: catId,
-        labelAr: catId,
-        order: 10,
-      };
-      categoryMap.set(catId, {
-        id: catId,
-        label: locale === "ar" ? info.labelAr : info.labelEn,
-        count: 0,
-        order: info.order,
-      });
+    const keys = p.filterKeys && p.filterKeys.length > 0 ? p.filterKeys : [p.filterKey];
+    for (const catId of keys) {
+      if (!categoryMap.has(catId)) {
+        const info = CANONICAL_CATEGORIES[catId] ?? {
+          id: catId,
+          labelEn: catId,
+          labelAr: catId,
+          order: 10,
+        };
+        categoryMap.set(catId, {
+          id: catId,
+          label: locale === "ar" ? info.labelAr : info.labelEn,
+          count: 0,
+          order: info.order,
+        });
+      }
+      categoryMap.get(catId)!.count += 1;
     }
-    categoryMap.get(catId)!.count += 1;
   }
 
   const dynamicCategories: MenuCategoryChip[] = Array.from(categoryMap.values())

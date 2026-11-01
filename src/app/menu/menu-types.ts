@@ -51,6 +51,7 @@ export type MenuProductSerialized = {
   /** Short label for the image badge, e.g. DESSERT */
   categoryLabel: string;
   filterKey: MenuFilterId | "other" | string;
+  filterKeys?: (MenuFilterId | "other" | string)[];
   pro: string;
   fat: string;
   carb: string;

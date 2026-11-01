@@ -63,15 +63,17 @@ export function MenuGridClient({ products, categories, locale }: Props) {
     // Fallback: extract dynamically from products
     const map = new Map<string, { id: string; label: string; count: number }>();
     for (const p of products) {
-      const catId = p.filterKey;
-      if (!map.has(catId)) {
-        map.set(catId, {
-          id: catId,
-          label: p.categoryLabel,
-          count: 0,
-        });
+      const keys = p.filterKeys && p.filterKeys.length > 0 ? p.filterKeys : [p.filterKey];
+      for (const catId of keys) {
+        if (!map.has(catId)) {
+          map.set(catId, {
+            id: catId,
+            label: p.categoryLabel,
+            count: 0,
+          });
+        }
+        map.get(catId)!.count += 1;
       }
-      map.get(catId)!.count += 1;
     }
 
     return [
@@ -94,7 +96,11 @@ export function MenuGridClient({ products, categories, locale }: Props) {
     const byCategory =
       active === "all"
         ? products
-        : products.filter((p) => p.filterKey === active);
+        : products.filter((p) =>
+            p.filterKeys && p.filterKeys.length > 0
+              ? p.filterKeys.includes(active)
+              : p.filterKey === active
+          );
 
     // 2. Filter by search query (within selected category)
     if (trimmedQuery.length === 0) return byCategory;
