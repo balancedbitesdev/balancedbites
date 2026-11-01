@@ -23,6 +23,7 @@ import {
   stripEmbeddedNutritionFromDescription,
 } from "@/lib/parse-product-nutrition";
 import { shopifyFetch } from "@/lib/shopify";
+import { groupProductsBySizes } from "@/lib/group-menu-products";
 import { MenuGridClient } from "./MenuGridClient";
 import type { MenuCategoryChip, MenuProductSerialized, MenuProductVariantSerialized } from "./menu-types";
 
@@ -985,132 +986,6 @@ function serializeProduct(node: ProductNode, locale: Locale): MenuProductSeriali
     caloriesNumber,
     sizeVariants,
   };
-}
-
-function extractSizeInfo(
-  title: string,
-  locale: Locale,
-): { baseTitle: string; sizeLabel: string | null; order: number } {
-  const isAr = locale === "ar";
-
-  // 1. Basbosa special casing: "Basbosa 2 Pieces", "Basbosa Set Of 6 Pieces", "بسبوسة 2 قطعة"
-  const mBasbosa = title.match(/^(Basbosa|بسبوسة)\s+(?:Set\s+Of\s+)?(\d+\s*(?:Pieces?|قطع(?:ة)?))/i);
-  if (mBasbosa) {
-    const size = mBasbosa[2];
-    const sizeLabel = isAr
-      ? (size.startsWith("2") ? "قطعتين (2 Pieces)" : "عبوة ٦ قطع (6 Pieces)")
-      : (size.startsWith("2") ? "2 Pieces" : "Set Of 6 Pieces");
-    return {
-      baseTitle: isAr ? "بسبوسة كيتو" : "Basbosa",
-      sizeLabel,
-      order: size.startsWith("2") ? 1 : 2,
-    };
-  }
-
-  // 2. Grams suffix: e.g. "Keto Chicken Sweet and Sour 250gm", "Chicken Fajita 500gm", "250 جم"
-  const mGrams = title.match(/^(.*?)\s*[-–—(]?\s*(\d+)\s*(?:gm|g|جم)\s*\)?$/i);
-  if (mGrams) {
-    const grams = parseInt(mGrams[2], 10);
-    return {
-      baseTitle: mGrams[1].trim(),
-      sizeLabel: isAr ? `${grams} جم` : `${grams}g`,
-      order: grams,
-    };
-  }
-
-  return { baseTitle: title.trim(), sizeLabel: null, order: 0 };
-}
-
-function groupProductsBySizes(
-  products: MenuProductSerialized[],
-  locale: Locale,
-): MenuProductSerialized[] {
-  const groupMap = new Map<
-    string,
-    {
-      baseTitle: string;
-      items: {
-        product: MenuProductSerialized;
-        sizeLabel: string | null;
-        order: number;
-      }[];
-    }
-  >();
-
-  for (const product of products) {
-    const { baseTitle, sizeLabel, order } = extractSizeInfo(product.title, locale);
-    const key = baseTitle.toLowerCase();
-    if (!groupMap.has(key)) {
-      groupMap.set(key, { baseTitle, items: [] });
-    }
-    groupMap.get(key)!.items.push({ product, sizeLabel, order });
-  }
-
-  const merged: MenuProductSerialized[] = [];
-
-  for (const group of groupMap.values()) {
-    if (group.items.length <= 1) {
-      merged.push(group.items[0].product);
-      continue;
-    }
-
-    // Sort by order so the smaller portion (e.g. 250g) is first
-    group.items.sort((a, b) => a.order - b.order);
-
-    // Primary product base is the smallest portion
-    const primary = { ...group.items[0].product };
-    primary.title = group.baseTitle;
-
-    // Create size variants from all products in this group
-    const sizeVariants: MenuProductVariantSerialized[] = group.items.map(
-      ({ product, sizeLabel }) => {
-        const title = sizeLabel || product.portionPlain || product.title;
-        return {
-          id: product.variantId || product.id,
-          title,
-          priceLabel: product.priceLabel,
-          pro: product.pro,
-          fat: product.fat,
-          carb: product.carb,
-          cal: product.cal,
-          portionPlain: title,
-          variantId: product.variantId,
-        };
-      },
-    );
-
-    primary.sizeVariants = sizeVariants;
-    primary.portionPlain = sizeVariants.map((v) => v.title).join(" / ");
-
-    // Combine images from all size options (deduped by url)
-    const seenUrls = new Set<string>();
-    const allImages = group.items
-      .flatMap((i) => i.product.images)
-      .filter((img) => {
-        if (!img.url || seenUrls.has(img.url)) return false;
-        seenUrls.add(img.url);
-        return true;
-      });
-    if (allImages.length > 0) {
-      primary.images = allImages;
-    }
-
-    // Combine filterKeys
-    const combinedFilterKeys = Array.from(
-      new Set(
-        group.items.flatMap((i) =>
-          i.product.filterKeys && i.product.filterKeys.length > 0
-            ? i.product.filterKeys
-            : [i.product.filterKey],
-        ),
-      ),
-    );
-    primary.filterKeys = combinedFilterKeys;
-
-    merged.push(primary);
-  }
-
-  return merged;
 }
 
 export default async function MenuPage() {
