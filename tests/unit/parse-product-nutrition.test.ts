@@ -107,6 +107,26 @@ describe("parseCategoryFromDescription & normalizeCategory", () => {
     expect(cat.id).toBe("high_protein");
   });
 
+  it("normalizes Keto Chicken Sweet and Sour into high_protein rather than keto_desserts", () => {
+    const cat250 = normalizeCategory(null, {
+      title: "Keto Chicken Sweet and Sour 250gm",
+      handle: "keto-chicken-sweet-and-sour-250gm",
+      productType: "Prepared Meal",
+      tags: ["high-protein", "keto", "meal"],
+    });
+    expect(cat250.id).toBe("high_protein");
+    expect(cat250.labelEn).toBe("High Protein");
+
+    const cat500 = normalizeCategory(null, {
+      title: "Keto Chicken Sweet and Sour 500gm",
+      handle: "keto-chicken-sweet-and-sour-500gm",
+      productType: "Prepared Meal",
+      tags: ["high-protein", "keto", "meal"],
+    });
+    expect(cat500.id).toBe("high_protein");
+    expect(cat500.labelEn).toBe("High Protein");
+  });
+
   it("normalizes custom clean category dynamically", () => {
     const cat = normalizeCategory("Cold Pressed Juices");
     expect(cat.id).toBe("cold_pressed_juices");

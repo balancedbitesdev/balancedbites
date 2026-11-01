@@ -585,23 +585,32 @@ export function normalizeCategory(
     return CANONICAL_CATEGORIES.salads;
   }
 
-  // 4. Clean carbs (rice, sweet potato, potato)
+  // 4. Meats, poultry, seafood, and savory dishes are definitively High Protein meals (never desserts)
+  const isMeatOrPoultry = /\b(chicken|beef|meat|steak|salmon|shrimp|fish|tuna|turkey|shawarma|kofta|kebab|kabab|meatball|meatballs|stroganoff|teriyaki|fajita|tawook|calzone|d[öo]ner|fillet|filet|burger|patty|patties|liver|mince|ribs|lamb|duck|seafood|sweet\s*(?:and|&)\s*sour)\b/i.test(combinedContext);
+
+  // 5. Clean carbs (rice, sweet potato, potato) - ONLY if it's not a meat meal
   if (
-    /(?:clean\s*carb|carb|rice|potato|كارب|أرز|بطاطا)/i.test(raw) ||
-    /\b(rice|basmati|sweet\s*potato|baked\s*potato)\b/i.test(combinedContext)
+    !isMeatOrPoultry &&
+    (/(?:clean\s*carb|carb|rice|potato|كارب|أرز|بطاطا)/i.test(raw) ||
+      /\b(rice|basmati|sweet\s*potato|baked\s*potato)\b/i.test(combinedContext))
   ) {
     return CANONICAL_CATEGORIES.clean_carb;
   }
 
-  // 5. Keto Desserts / Desserts (handles "Dessert", "Desert", "Keto Dessert", "Cake", "Cookie", etc.)
+  // 6. High Protein / Meals (chicken, beef, meatballs, kofta, shawarma, doner, stroganoff, sweet and sour, etc.)
   if (
-    /(?:keto|dessert|desert|sweet|حلو|حلويات)/i.test(raw) ||
-    /\b(dessert|sweet|brownie|cake|cookie|tart|jar|kahk|basbosa|truffle|cereal|cupcake|muffin|loaf|lazy\s*cake)\b/i.test(combinedContext)
+    isMeatOrPoultry ||
+    /(?:protein|meal|main|بروتين|وجبة|وجبات)/i.test(raw) ||
+    /\b(high[-_\s]protein|prepared\s*meal|meals?)\b/i.test(`${ctxType} ${ctxTags}`)
   ) {
-    return CANONICAL_CATEGORIES.keto_desserts;
+    // If it's a known dessert noun (jar, brownie, cake, cookie, truffle) without meat, classify as dessert
+    const hasDessertNoun = /\b(brownie|brownies|cake|cakes|cookie|cookies|tart|tarts|protein\s*jar|jar|jars|kahk|basbosa|truffle|truffles|cupcake|cupcakes|muffin|muffins|loaf|lazy\s*cake|cheesecake|pudding|donut|donuts|doughnut|doughnuts)\b/i.test(combinedContext);
+    if (!hasDessertNoun || isMeatOrPoultry) {
+      return CANONICAL_CATEGORIES.high_protein;
+    }
   }
 
-  // 6. Frozen
+  // 7. Frozen
   if (
     /(?:frozen|فروزن|مجمد)/i.test(raw) ||
     /\bfrozen\b/i.test(combinedContext)
@@ -609,12 +618,12 @@ export function normalizeCategory(
     return CANONICAL_CATEGORIES.frozen;
   }
 
-  // 7. High Protein / Meals (chicken, beef, meatballs, kofta, shawarma, doner, stroganoff, etc.)
+  // 8. Keto Desserts / Desserts (handles "Dessert", "Desert", "Keto Dessert", "Cake", "Cookie", etc.)
   if (
-    /(?:protein|meal|main|بروتين|وجبة|وجبات)/i.test(raw) ||
-    /\b(chicken|beef|meat|shawarma|kofta|kebab|kabab|meatball|stroganoff|teriyaki|fajita|tawook|calzone|d[öo]ner|fillet|pizza|meal)\b/i.test(combinedContext)
+    /(?:keto\s*(?:desserts?|deserts?|sweets?)|desserts?|deserts?|sweets?|حلويات|حلوى?)/i.test(raw) ||
+    /\b(dessert|desserts|desert|deserts|sweets|brownie|brownies|cake|cakes|cookie|cookies|tart|tarts|jar|jars|kahk|basbosa|truffle|truffles|cereal|cupcake|cupcakes|muffin|muffins|loaf|lazy\s*cake|cheesecake|pudding|ice\s*cream|donuts?|doughnuts?|bites)\b/i.test(combinedContext)
   ) {
-    return CANONICAL_CATEGORIES.high_protein;
+    return CANONICAL_CATEGORIES.keto_desserts;
   }
 
   // 8. If raw category exists and is a custom valid string (not a macro string or empty)
